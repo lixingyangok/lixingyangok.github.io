@@ -1,18 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Suspense} from 'react';
+import { NavLink } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
+import styled from 'styled-components';
+const Li = styled.li`
+  color: red;
+  .active{
+    background: yellow;
+  }
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>
-          Hello React
-        </h1>
-      </header>
-    </div>
-  );
+  return <BrowserRouter>
+    <ul>
+      <Li>
+        <NavLink to='/index' >首页</NavLink>
+        &emsp;
+        <NavLink to='/about' >关于</NavLink>
+      </Li>
+    </ul>
+    {/* ▼异步组件父级必须有 Suspense */}
+    <Suspense fallback={<div>Loading...</div>}>
+      <Switch>
+        <Redirect exact from="/" to="/index" ></Redirect>
+        <Route path="/index" component={React.lazy(() => import('./pages/index/index.jsx'))} />
+        <Route path="/about" component={React.lazy(() => import('./pages/about/about.jsx'))} />
+      </Switch>
+    </Suspense>
+  </BrowserRouter>
 }
 
+
 export default App;
+
