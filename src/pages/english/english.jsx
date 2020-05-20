@@ -1,43 +1,111 @@
 import React from "react";
-import pic01 from './img/pic01.jpg';
-import mp3 from './mp3/english.mp3';
-import WaveSurfer from 'wavesurfer.js';
-import styled from 'styled-components';
+import mp3 from "./mp3/Im Lost.mp3";
+import styled from "styled-components";
 
-const WaterBox  = styled.div`
-  height: 300px;
-  background: pink;
+const regions = `
+1
+00:00:08,370 --> 00:00:12,050
+Hi everyone, I'm Lisa. Hey guys I'm John
+
+2
+00:00:12,050 --> 00:00:15,450
+Today we will learn how to ask for directions
+
+3
+00:00:15,450 --> 00:00:17,570
+Ok, how to ask for directions
+
+`.split('\n').filter(cur=>{
+  if (!cur) return false;
+  return /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur)   //false;
+}).map(cur=>{
+  const [aa,bb] = cur.split(' --> ');
+  return {
+    start: aa.replace('00:00:', '').replace(',', '.') * 1,
+    end: bb.replace('00:00:', '').replace(',', '.') * 1,
+    color: "hsla(200, 50%, 70%, 0.4)",
+  };
+});
+console.log(regions);
+
+const Div = styled.div`
+  margin: 30px;
+  .a99{
+    background: pink;
+  }
 `;
-console.log( WaveSurfer );
+const WaveSurfer = window.WaveSurfer;
+console.log('WaveSurfer---', WaveSurfer);
 
-export default function () {
-  React.useEffect(
-    // 1参是个函数，定义在useState之后，可拿到state值
-    // 在 return 之后执行（类似在render之后执行）
-      ()=>{
-          console.log('React.useEffect 1参执行');
-          var wavesurfer = WaveSurfer.create({
-              container: '#a99',
-              scrollParent: !true,
-          });
-          wavesurfer.load(mp3);
-          wavesurfer.on('ready', function () {
-              wavesurfer.play();
-          });
-          // wavesurfer.playPause()
-      },
-      // ▼2参为空那么：在【挂载或更新（即state更新）】后就执行1参的方法，连1参返回的方法也执行!!!
-      // ▼2参为空数组，相当于 componentDidMount，仅仅在【挂载后】执行一次，在卸载时执行1参返回的方法
-      // ▼一般数组，当【监听到数组内值发生变化后】，执行1参的方法
-      [],
-  );
-  return <h1>
-    <img src={pic01} alt=""/>
-    <audio controls>
-      <source src={mp3} type="audio/mpeg"/>
-    </audio>
-    <WaterBox id="a99" >
-      123
-    </WaterBox>
-  </h1>;
+var plugins = [];
+plugins.push(WaveSurfer.regions.create({
+  regions,
+  dragSelection: { slop: 5 },
+}));
+plugins.push(WaveSurfer.timeline.create({
+  container: "#wave-timeline",
+}));
+
+const componentDidMount = function(){
+  var wavesurfer = WaveSurfer.create({
+    container: "#a99",
+    scrollParent: true,
+    height: 160,
+    plugins,
+  });
+  wavesurfer.load(mp3);
+  wavesurfer.on("ready", function () {
+    const idx = 2;
+    wavesurfer.play(regions[idx].start, regions[idx].end);
+    // console.log('加载完成');
+    // wavesurfer.play();
+  });
 }
+
+export default class extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      wavesurfer: 0,
+    };
+  }
+  render() {
+    console.log("03-C-Render（双重调用");
+    return (
+      <Div>
+        <audio controls>
+          <source src={mp3} type="audio/mpeg"/>
+        </audio>
+        <div id="a99" className="a99"></div>
+        <div id="wave-timeline"></div>
+      </Div>
+    );
+  }
+  componentDidMount = componentDidMount;
+  componentDidMount1() {
+    var plugins = [];
+    plugins.push(WaveSurfer.regions.create({
+      regions: [
+        { start: 1, end: 3, loop: false, color: "hsla(400, 100%, 30%, 0.5)" },
+        { start: 5, end: 7, loop: false, color: "hsla(200, 50%, 70%, 0.4)" },
+      ],
+      dragSelection: { slop: 5 },
+    }));
+    plugins.push(WaveSurfer.timeline.create({
+      container: "#wave-timeline",
+    }));
+    var wavesurfer = WaveSurfer.create({
+      container: "#a99",
+      scrollParent: true,
+      height: 160,
+      plugins,
+    });
+    console.log('WaveSurfer2-------', wavesurfer);
+    wavesurfer.load(mp3);
+    wavesurfer.on("ready", function () {
+      console.log('加载完成');
+      // wavesurfer.play();
+    });
+  }
+}
+
