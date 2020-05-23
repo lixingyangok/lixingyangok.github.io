@@ -1,5 +1,6 @@
 import React from "react";
-import styled from "styled-components";
+import { Div } from './style/english.js';
+const WaveSurfer = window.WaveSurfer;
 
 async function getText(){
   let res = await fetch('./static/Im Lost.srt', {
@@ -22,70 +23,54 @@ function getTimeLine(text){
     if (!cur) return false;
     return /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur);
   });
-  getSeconds(strArr[0].split(' --> ')[0]);
   return strArr.map(cur=>{
     const [aa,bb] = cur.split(' --> ');
     return {
       start: getSeconds(aa),
       end: getSeconds(bb),
       color: "hsla(200, 50%, 70%, 0.4)",
+      drag: false,
     };
-  });
+  }).slice(0, 2);
 };
 
-const Div = styled.div`
-  margin: 30px;
-  .a99{
-    background: pink;
-    .wavesurfer-handle{
-      width: 1px !important;
-    }
-  }
-  .sentence-wrap{
-    margin: 30px 0 0;
-  }
-  .sentence{
-    display: inline-block;
-    background: yellow;
-    margin: 5px 10px 0 0;
-    padding: 3px 10px;
-    border-radius: 3px;
-  }
-`;
 
-const WaveSurfer = window.WaveSurfer;
 
 const componentDidMount = async function(){
   let res = await getText();
-
   let regions = getTimeLine(res);
-  
   var plugins = [];
   plugins.push(WaveSurfer.regions.create({
     regions,
-    dragSelection: {slop: 5},
+    drag: false,
   }));
   plugins.push(WaveSurfer.timeline.create({
     container: "#wave-timeline",
   }));
-  var wavesurfer = WaveSurfer.create({
+  var myWave = WaveSurfer.create({
     container: "#a99",
     scrollParent: true,
     height: 180,
+    minPxPerSec: 40,
     plugins,
-    minPxPerSec: 80,
   });
-  wavesurfer.load('./static/Im Lost.mp3');
-  wavesurfer.on("ready", function () {
-    // wavesurfer.zoom(80);
-    // const idx = 5;
-    // wavesurfer.play(regions[idx].start, regions[idx].end);
-    // console.log('加载完成');
-    // wavesurfer.play();
-  });
+  console.log('myWave', myWave);
+  myWave.load('./static/Im Lost.mp3');
   this.setState({
     aSentences: regions,
-    wavesurfer,
+    myWave,
+  });
+  document.addEventListener('keydown', function(ev){
+    if (ev.keyCode === 9){ //tab
+      myWave.playPause()
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.cancelBubble = true;
+    window.event.preventDefault()
+    window.event.stopPropagation()
+    window.event.cancelBubble = true
+    return false
   });
 }
 
@@ -94,7 +79,7 @@ export default class extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      wavesurfer: {},
+      myWave: {},
       aSentences: [],
       iZoom: 50,
     };
@@ -104,13 +89,13 @@ export default class extends React.Component {
     const {aSentences} = this.state;
     return (
       <Div>
-        <div id="a99" className="a99"></div>
         <div id="wave-timeline"></div>
+        <div id="a99" className="a99"></div>
         <br/><br/>
         <div>
           {[...Array(8)].map((cur,idx)=>{
-            return <button onClick={()=>this.zoomIt((idx+1) * 20)} >
-              {(idx+1) * 20}
+            return <button key={idx} onClick={()=>this.zoomIt((idx+1) * 30)} >
+              {(idx+1) * 30}
             </button>
           })}
         </div>
@@ -128,12 +113,12 @@ export default class extends React.Component {
   }
   componentDidMount = componentDidMount;
   playIt(idx){
-    const {wavesurfer, aSentences} = this.state;
-    wavesurfer.play(aSentences[idx].start, aSentences[idx].end);
+    const {myWave, aSentences} = this.state;
+    myWave.play(aSentences[idx].start, aSentences[idx].end);
     // console.log(idx);
   }
   zoomIt(value){
-    this.state.wavesurfer.zoom(value);
+    this.state.myWave.zoom(value);
   }
 }
 
