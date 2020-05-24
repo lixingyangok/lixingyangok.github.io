@@ -1,49 +1,19 @@
 import React from "react";
+import * as fn from './js/english.js';
 import { Div } from './style/english.js';
 const WaveSurfer = window.WaveSurfer;
 
-async function getText(){
-  let res = await fetch('./static/Im Lost.srt', {
-    method: "get",
-    headers: {"Content-Type": "application/json"},
-    credentials: "same-origin",
-  });
-  return res.text();
-};
-
-function getSeconds(text){
-  const [hour, minute, second, tail] = text.match(/\d+/g);
-  let number = (hour * 60 * 60) + (minute * 60) + `${second}.${tail}` * 1;
-  return number.toFixed(2) * 1;
-};
-
-function getTimeLine(text){
-  let strArr = text.split('\n');
-  strArr = strArr.filter(cur=>{
-    if (!cur) return false;
-    return /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur);
-  });
-  return strArr.map(cur=>{
-    const [aa,bb] = cur.split(' --> ');
-    return {
-      start: getSeconds(aa),
-      end: getSeconds(bb),
-      color: "hsla(200, 50%, 70%, 0.4)",
-      drag: false,
-    };
-  }).slice(0, 2);
-};
-
-
 
 const componentDidMount = async function(){
-  let res = await getText();
-  let regions = getTimeLine(res);
+  let res = await fn.getText();
+  let regions = fn.getTimeLine(res);
   var plugins = [];
-  plugins.push(WaveSurfer.regions.create({
+  var p01 = WaveSurfer.regions.create({
     regions,
     drag: false,
-  }));
+  })
+  plugins.push(p01);
+  console.log(p01);
   plugins.push(WaveSurfer.timeline.create({
     container: "#wave-timeline",
   }));
@@ -66,14 +36,9 @@ const componentDidMount = async function(){
     }
     ev.preventDefault();
     ev.stopPropagation();
-    ev.cancelBubble = true;
-    window.event.preventDefault()
-    window.event.stopPropagation()
-    window.event.cancelBubble = true
     return false
   });
 }
-
 
 export default class extends React.Component {
   constructor(props){
@@ -85,7 +50,6 @@ export default class extends React.Component {
     };
   }
   render() {
-    console.log("03-C-Render（双重调用");
     const {aSentences} = this.state;
     return (
       <Div>
@@ -121,4 +85,5 @@ export default class extends React.Component {
     this.state.myWave.zoom(value);
   }
 }
+
 
