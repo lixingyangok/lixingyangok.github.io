@@ -5,6 +5,31 @@ const WaveSurfer = window.WaveSurfer;
 
 
 const componentDidMount = async function(){
+  fn.getMp3()
+  // let mp3 = await fn.getMp3();
+  // console.log('mp3', mp3);
+  //使用web audio api解码
+	// audioContext.decodeAudioData(
+  //   mp3, 
+  //   function (buffer) {
+  //     // 每秒绘制100个点，就是将每秒44100个点分成100份，
+  //     // 每一份算出最大值和最小值来代表每10毫秒内的波峰和波谷
+  //     // const perSecPx = 100;
+  //     const perSecPx = 1;
+  //     // 获取所有波峰波谷，peaks 即为最后所需波形数据
+  //     const peaks = fn.getPeaks(buffer, perSecPx);
+  //     // 销毁audioContext 和 source 对象，因为前端是使用audio标签播放的
+  //     // audio标签能满足大部分需求，WebAudio Api控制起来真的很不简单。
+  //     // 如果不销毁audioContext对象的话，audio标签是无法播放的
+  //     console.log(peaks);
+  //     source = null;
+  //     audioContext = null;
+  //   }, function (err) {console.log('出错了', err)}
+  // );
+
+
+
+
   let res = await fn.getText();
   let regions = fn.getTimeLine(res);
   var plugins = [];
@@ -53,6 +78,7 @@ export default class extends React.Component {
     const {aSentences} = this.state;
     return (
       <Div>
+        <audio controls="controls" src="./static/Im Lost.mp3"/>
         <div id="wave-timeline"></div>
         <div id="a99" className="a99"></div>
         <br/><br/>
