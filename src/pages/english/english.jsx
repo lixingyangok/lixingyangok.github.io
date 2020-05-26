@@ -1,11 +1,13 @@
 import React from "react";
 import * as fn from './js/english.js';
-import { Div } from './style/english.js';
+import {Div, MyBox} from './style/english.js';
 const WaveSurfer = window.WaveSurfer;
 
 
 const componentDidMount = async function(){
-  fn.getMp3()
+  let res11 = await fn.getMp3()
+  console.log('波', res11.slice(0, 10));
+
   // let mp3 = await fn.getMp3();
   // console.log('mp3', mp3);
   //使用web audio api解码
@@ -27,9 +29,6 @@ const componentDidMount = async function(){
   //   }, function (err) {console.log('出错了', err)}
   // );
 
-
-
-
   let res = await fn.getText();
   let regions = fn.getTimeLine(res);
   var plugins = [];
@@ -45,15 +44,17 @@ const componentDidMount = async function(){
   var myWave = WaveSurfer.create({
     container: "#a99",
     scrollParent: true,
-    height: 180,
+    height: 150,
     minPxPerSec: 40,
     plugins,
   });
-  console.log('myWave', myWave);
+  // console.log('myWave', myWave);
   myWave.load('./static/Im Lost.mp3');
   this.setState({
     aSentences: regions,
     myWave,
+    width: res11.length / 2 + 'px',
+    aWave: res11,
   });
   document.addEventListener('keydown', function(ev){
     if (ev.keyCode === 9){ //tab
@@ -66,28 +67,39 @@ const componentDidMount = async function(){
 }
 
 export default class extends React.Component {
+  myCanvas = React.createRef();
   constructor(props){
     super(props);
     this.state = {
       myWave: {},
+      aWave: [],
       aSentences: [],
       iZoom: 50,
+      width: 0,
     };
   }
   render() {
+    const {state} = this;
     const {aSentences} = this.state;
     return (
       <Div>
         <audio controls="controls" src="./static/Im Lost.mp3"/>
         <div id="wave-timeline"></div>
         <div id="a99" className="a99"></div>
+        <MyBox>
+          <canvas ref={this.myCanvas}
+            width={state.width} 
+            height="200"
+          />
+        </MyBox>
         <br/><br/>
         <div>
           {[...Array(8)].map((cur,idx)=>{
             return <button key={idx} onClick={()=>this.zoomIt((idx+1) * 30)} >
-              {(idx+1) * 30}
+              缩放{(idx+1) * 30}
             </button>
           })}
+          <button onClick={()=>this.toDraw()}>画轴</button>
         </div>
         <div className="sentence-wrap" >
           {aSentences.map((cur,idx)=>{
@@ -110,6 +122,25 @@ export default class extends React.Component {
   zoomIt(value){
     this.state.myWave.zoom(value);
   }
-}
+  toDraw(){
+    const {aWave} = this.state;
+    const myCanvas = this.myCanvas.current.getContext('2d');
+    let idx = -1;
+    let aim = aWave.length / 2;
+    console.time('时间');
+    while(idx<aim){
+      idx++
+      const cur1 = aWave[idx * 2];
+      const cur2 = aWave[idx * 2 + 1];
+      myCanvas.fillStyle = '#444';
+      myCanvas.fillRect(
+        idx, (100 - cur1), 1, Math.ceil(cur1 - cur2),
+      );
+      myCanvas.fillStyle = '#000';
+      myCanvas.fillRect(idx, 100, 1, 1);
+    }
+    console.timeEnd('时间');
+  }
+};
 
-
+// 

@@ -19,3 +19,16 @@ export const Div = styled.div`
     border-radius: 3px;
   }
 `;
+
+export const MyBox = styled.div`
+  width: 100%;
+  height: 220px;
+  background: yellow;
+  margin: 20px 0 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  canvas{
+    /* height: 200px; */
+    outline: solid 1px blue;
+  }
+`;
