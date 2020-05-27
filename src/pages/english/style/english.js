@@ -8,9 +8,6 @@ export const Div = styled.div`
       width: 1px !important;
     }
   }
-  .sentence-wrap{
-    margin: 30px 0 0;
-  }
   .sentence{
     display: inline-block;
     background: yellow;
