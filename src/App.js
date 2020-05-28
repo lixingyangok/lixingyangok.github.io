@@ -17,6 +17,8 @@ function App() {
         &emsp;
         <NavLink to='/english' >英语</NavLink>
         &emsp;
+        <NavLink to='/english-2' >英语-2</NavLink>
+        &emsp;
         <NavLink to='/about' >关于</NavLink>
       </Li>
     </ul>
@@ -26,6 +28,7 @@ function App() {
         <Redirect exact from="/" to="/index" ></Redirect>
         <Route path="/index" component={React.lazy(() => import('./pages/index/index.jsx'))} />
         <Route path="/english" component={React.lazy(() => import('./pages/english/english.jsx'))} />
+        <Route path="/english-2" component={React.lazy(() => import('./pages/english-2/english.jsx'))} />
         <Route path="/about" component={React.lazy(() => import('./pages/about/about.jsx'))} />
       </Switch>
     </Suspense>
