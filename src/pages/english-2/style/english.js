@@ -2,18 +2,19 @@ import styled from "styled-components";
 
 export const Div = styled.div`
   margin: 30px;
-  .a99{
-    background: pink;
-    .wavesurfer-handle{
-      width: 1px !important;
-    }
-  }
   .sentence{
     display: inline-block;
     background: yellow;
     margin: 5px 10px 0 0;
     padding: 3px 10px;
     border-radius: 3px;
+  }
+  .one-line{
+    line-height: 2;
+    &:hover{
+      background: #eee;
+      cursor: pointer;
+    }
   }
 `;
 
@@ -30,6 +31,7 @@ export const MyBox = styled.div`
     outline: solid 1px blue;
   }
   .sentence{
+    box-sizing: border-box;
     position: absolute;
     top: 0px;
     height: 100%;
@@ -38,5 +40,7 @@ export const MyBox = styled.div`
     z-index: 3;
     margin: 0;
     padding: 0;
+    border: solid blue;
+    border-width: 0 1px;
   }
 `;

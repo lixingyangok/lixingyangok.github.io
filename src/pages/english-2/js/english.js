@@ -21,21 +21,23 @@ export function getSeconds(text) {
   return number.toFixed(2) * 1;
 };
 
-export function getTimeLine(text) {
+export function getTimeLine(text, getArr) {
   let strArr = text.split('\n');
-  strArr = strArr.filter(cur => {
-    if (!cur) return false;
-    return /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur);
+  const aLine = [];
+  strArr = strArr.filter((cur, idx) => {
+    const isTime = /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur);
+    if (!isTime) return false;
+    aLine.push(strArr[idx+1]);
+    return isTime;
   });
-  return strArr.map(cur => {
+  return strArr.map((cur, idx) => {
     const [aa, bb] = cur.split(' --> ');
     const [start, end] = [getSeconds(aa), getSeconds(bb)];
     return {
       start,
       end,
-      long: end - start,
-      color: "hsla(200, 50%, 70%, 0.4)",
-      drag: false,
+      long: (end - start).toFixed(2) * 1,
+      text: aLine[idx],
     };
   });
 };
@@ -68,8 +70,9 @@ export function getPeaks(buffer, perSecPx) {
       if (value > max) max = value;
       else if (value < min) min = value;
     }
-    peaks[2 * idx] = max * 60; // 波峰
-    peaks[2 * idx + 1] = min * 60; // 波谷
+    const height = 90;
+    peaks[2 * idx] = max * height; // 波峰
+    peaks[2 * idx + 1] = min * height; // 波谷
   }
   return peaks;
 }

@@ -2,18 +2,12 @@ import React from "react";
 import * as fn from './js/english.js';
 import {Div, MyBox} from './style/english.js';
 
-
-
 const componentDidMount = async function(){
-  // let aWave = await fn.getMp3();
-  const [buffer, sText] = await Promise.all([
-    fn.getMp3(),
-    fn.getText(),
-  ]);
-  const aWave = fn.getPeaks(buffer, 50);
-  const aTimeLine = fn.getTimeLine(sText).slice(0,3);
+  const [buffer, sText] = await Promise.all([fn.getMp3(), fn.getText()]);
+  const aWave = fn.getPeaks(buffer, 70);
+  const aTimeLine = fn.getTimeLine(sText);
   const iWidth = aWave.length / 2; // 画布宽度
-  console.log('res', aWave, aTimeLine);
+  console.log(`一秒${iWidth / buffer.duration}像素`);
   this.setState({
     buffer,
     aWave,
@@ -23,46 +17,54 @@ const componentDidMount = async function(){
     fSecondToPx: iWidth / buffer.duration,
   });
   this.toDraw();
+  
 }
 
 export default class extends React.Component {
-  myCanvas = React.createRef();
   oCanvas = React.createRef();
+  oAudio = React.createRef();
   constructor(props){
     super(props);
     this.state = {
       buffer: {}, //音频数据
       aWave: [], //波形数据
       iWidth: 0,
-      aTimeLine: [{start: 0, end: 3}], //
+      aTimeLine: [], //
       duration: 0,
       fSecondToPx: 0,
+      timer: null,
     };
   }
   render() {
     const {state} = this;
     const {fSecondToPx} = state;
-    return (
-      <Div>
-        <audio controls="controls" src="./static/Im Lost.mp3"/>
-        <MyBox>
-          <canvas width={state.iWidth} height={200} ref={this.oCanvas}/>
-          {state.aTimeLine.map((cur,idx)=>{
-            return <span className="sentence" key={idx} 
-              style={{left: `${cur.start * fSecondToPx}px`, right: `${cur.long * fSecondToPx}px`}}
-            />
-          })}
-        </MyBox>
-        <br/><br/>
-        <div>
-          {[...Array(8)].map((cur,idx)=>{
-            return <button key={idx} onClick={()=>this.zoomIt((idx+1) * 30)} >
-              缩放{(idx+1) * 10}
-            </button>
-          })}
-        </div>
-      </Div>
-    );
+    return <Div>
+      <audio controls="controls" src="./static/Im Lost.mp3" ref={this.oAudio}/>
+      <MyBox>
+        <canvas width={state.iWidth} height={200} ref={this.oCanvas}/>
+        {state.aTimeLine.map((cur,idx)=>{
+          return <span className="sentence" key={idx} 
+            style={{left: `${cur.start * fSecondToPx}px`, width: `${cur.long * fSecondToPx}px`}}
+            onClick={()=>this.toPlay(cur)}
+          />
+        })}
+      </MyBox>
+      <br/><br/>
+      <div>
+        {[...Array(8)].map((cur,idx)=>{
+          return <button key={idx} onClick={()=>this.zoomIt((idx+1) * 30)} >
+            缩放{(idx+1) * 10}
+          </button>
+        })}
+      </div>
+      <ul>
+        {state.aTimeLine.map((cur, idx)=>{
+          return <li className="one-line" key={idx} onClick={()=>this.toPlay(cur)}>
+            {cur.text}
+          </li>
+        })}
+      </ul>
+    </Div>
   }
   componentDidMount = componentDidMount;
   toDraw(){
@@ -84,6 +86,20 @@ export default class extends React.Component {
     }
     return oCanvas;
   }
+  toPlay(oOneLine){
+    clearTimeout(this.state.timer);
+    const Audio = this.oAudio.current;
+    // Audio.pauseAudio();
+    Audio.currentTime = oOneLine.start;
+    Audio.play();
+    let timer = setTimeout(()=>{
+      Audio.pause();
+    }, oOneLine.long * 1000);
+    console.log(timer);
+    this.setState({timer});
+    console.log(oOneLine);
+  }
+
 };
 
 // 

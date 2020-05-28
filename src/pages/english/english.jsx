@@ -4,14 +4,19 @@ import {Div, MyBox} from './style/english.js';
 const WaveSurfer = window.WaveSurfer;
 
 const componentDidMount = async function(){
+  let res = await fn.getText();
+  let regions = fn.getTimeLine(res);
   var plugins = [WaveSurfer.timeline.create({
     container: "#wave-timeline",
+  }),WaveSurfer.regions.create({
+    regions,
+    drag: false,
   })];
   var myWave = WaveSurfer.create({
     container: "#a99",
     scrollParent: true,
     height: 150,
-    minPxPerSec: 40,
+    minPxPerSec: 30,
     plugins,
   });
   myWave.load('./static/Im Lost.mp3');
@@ -21,7 +26,15 @@ const componentDidMount = async function(){
     myWave,
     aWave,
   });
-  this.toDraw();
+  // this.toDraw();
+  document.addEventListener('keydown', function(ev){
+    if (ev.keyCode === 9){ //tab
+      myWave.playPause()
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+    return false
+  });
 }
 
 export default class extends React.Component {
@@ -49,7 +62,7 @@ export default class extends React.Component {
         <div>
           {[...Array(8)].map((cur,idx)=>{
             return <button key={idx} onClick={()=>this.zoomIt((idx+1) * 30)} >
-              缩放{(idx+1) * 10}
+              缩放{(idx+1) * 5}
             </button>
           })}
         </div>
@@ -78,6 +91,11 @@ export default class extends React.Component {
       Context.fillRect(idx, 100, 1, 1);
     }
     return oCanvas;
+  }
+  playIt(idx){
+    const {myWave, aSentences} = this.state;
+    myWave.play(aSentences[idx].start, aSentences[idx].end);
+    // console.log(idx);
   }
 };
 
