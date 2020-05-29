@@ -40,7 +40,25 @@ export const MyBox = styled.div`
     z-index: 3;
     margin: 0;
     padding: 0;
-    border: solid blue;
+    border: solid gray;
     border-width: 0 1px;
+    &[class~=cur]{
+      border-color: red;
+      border-width: 0 2px;
+    }
   }
+  .pointer{
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background: black;
+    top: 0;
+    left: 100px;
+    /* transition-timing-function: linear !important; */
+  }
+`;
+
+export const Textarea = styled.textarea`
+  width: 100%;
+  height: 90px;
 `;
