@@ -47,6 +47,7 @@ class A01 extends React.Component {
           123
         </Textarea>
       </div>
+      <button onClick={()=>this.log()}>asdf</button>
       <ul>
         {state.aTimeLine.map((cur, idx)=>{
           return <li className="one-line" key={idx} onClick={()=>this.toPlay(idx)}>
