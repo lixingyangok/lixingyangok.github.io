@@ -21,7 +21,7 @@ export const Div = styled.div`
 export const MyBox = styled.div`
   width: 100%;
   height: 220px;
-  background: yellow;
+  background: black;
   margin: 20px 0 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -36,24 +36,27 @@ export const MyBox = styled.div`
     top: 0px;
     height: 100%;
     min-width: 1px;
-    background: rgba(0,0,0,0.1);
-    z-index: 3;
+    background: rgba(0,0,0,0.4);
+    z-index: 4;
     margin: 0;
     padding: 0;
-    border: solid gray;
+    border: solid rgba(255,255,255,0.5);
     border-width: 0 1px;
+    overflow: hidden;
     &[class~=cur]{
-      border-color: red;
+      border-color: transparent blue transparent red;
       border-width: 0 2px;
+      background: rgba(0,0,0,0);
     }
   }
   .pointer{
     position: absolute;
     width: 1px;
     height: 100%;
-    background: black;
+    background: white;
     top: 0;
     left: 100px;
+    z-index: 9;
     /* transition-timing-function: linear !important; */
   }
 `;
