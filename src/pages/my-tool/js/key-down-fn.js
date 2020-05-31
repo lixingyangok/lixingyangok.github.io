@@ -1,21 +1,23 @@
-import * as fn from './my-tool.js';
+import * as fn from './my-tool-pure-fn.js';
+import {message} from 'antd';
 
 export default class{
   // ▼监听按键
   watchKeyDown(){
     const fnLib = {
-      'ctrl + 74': ()=>this.previousAndNext(-1), // Ctrl + j
-      'ctrl + 75': ()=>this.previousAndNext(1), // Ctrl + k
-      'ctrl + 68': ()=>this.toDel(), // Ctrl + k
       'ctrl + 13': ()=>this.toPlay(), // enter
-      'alt + 85': ()=>this.fixRegion('start', -0.1), // u
-      'alt + 73': ()=>this.fixRegion('start', 0.1), // i
-      'alt + 74': ()=>this.fixRegion('end', -0.1), // <
-      'alt + 75': ()=>this.fixRegion('end', 0.1), // >
-      'shift + alt + 85': ()=>this.fixRegion('start', -0.5), // n
-      'shift + alt + 73': ()=>this.fixRegion('start', 0.5), // m
-      'shift + alt + 74': ()=>this.fixRegion('end', -0.5), // <
-      'shift + alt + 75': ()=>this.fixRegion('end', 0.5), // >
+      'ctrl + 68': ()=>this.toDel(), // d
+      'ctrl + 83': ()=>this.toSave(), // s
+      'ctrl + 74': ()=>this.previousAndNext(-1), // j
+      'ctrl + 75': ()=>this.previousAndNext(1), // k
+      'alt + 85': ()=>this.fixRegion('start', -0.35), // u
+      'alt + 73': ()=>this.fixRegion('start', 0.35), // i
+      'alt + 74': ()=>this.fixRegion('end', -0.35), // <
+      'alt + 75': ()=>this.fixRegion('end', 0.35), // >
+      'shift + alt + 85': ()=>this.fixRegion('start', -0.1), // n
+      'shift + alt + 73': ()=>this.fixRegion('start', 0.1), // m
+      'shift + alt + 74': ()=>this.fixRegion('end', -0.1), // <
+      'shift + alt + 75': ()=>this.fixRegion('end', 0.1), // >
     }
     const toRunFn = ev => {
       const {ctrlKey, shiftKey, altKey, keyCode} = ev;
@@ -71,6 +73,11 @@ export default class{
     this.setState({
       aTimeLine: aTimeLine.filter((cur, idx) => idx !== iCurLine),
     });
+  }
+  async toSave(){
+    const {aTimeLine, fileName} = this.state;
+    window.lf.setItem(fileName, aTimeLine);
+    message.success('保存成功');
   }
   fixRegion(sKey, iDirection){
     const {aTimeLine, iCurLine} = this.state;

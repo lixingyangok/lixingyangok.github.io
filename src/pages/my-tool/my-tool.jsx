@@ -1,8 +1,8 @@
 import React from "react";
-import * as fn from './js/my-tool.js';
 import * as cpnt from './style/my-tool-style.js';
 import theFn from './js/my-tool-fn.js';
 import keyDownFn from './js/key-down-fn.js';
+import {Button} from 'antd';
 
 export default class Tool extends window.mix(
   React.Component,
@@ -20,19 +20,28 @@ export default class Tool extends window.mix(
       buffer: {}, //音频数据
       aWave: [], //波形数据
       fCanvasWidth: 0, //画布宽
-      aTimeLine: [], //字幕
       duration: 0, //音频长度（秒
       oneScPx: 0, //一秒种的
       timer: null, //定时器1
       timer02: null, //定时器2
-      iCurLine: 1, //当前行
+      iCurLine: 0, //当前行
+      aTimeLine: [{
+        start_: '00:00:00,000',
+        end_: '00:00:09,000',
+        start: 0,
+        end: 9,
+        long: 9,
+        text: '',
+      }], //字幕
+      fileName: '',
+      fileSrc: './static/Im Lost.mp3',
     };
   }
   render() {
     const {state} = this;
-    const {oneScPx, aTimeLine, iCurLine, fCanvasWidth} = state;
+    const {oneScPx, aTimeLine, iCurLine, fCanvasWidth, fileSrc} = state;
     return <cpnt.Div>
-      <audio src="./static/Im Lost.mp3" ref={this.oAudio}/>
+      <audio src={fileSrc} ref={this.oAudio}/>
       <cpnt.WaveWrap ref={this.oBox}>
         <canvas width={fCanvasWidth} height={200} ref={this.oCanvas}/>
         <i className="pointer" ref={this.oPointer} />
@@ -46,8 +55,12 @@ export default class Tool extends window.mix(
         })}
       </cpnt.WaveWrap>
       <div>
-        <button onClick={()=>this.toExport()}>保存</button>
-        <button onClick={()=>this.toExport()}>导出</button>
+        <br/>
+        <Button type="primary" onClick={()=>this.toSave()}>保存</Button>
+        &nbsp;
+        <Button onClick={()=>this.toExport()}>导出</Button>
+        &nbsp;
+        <input type="file" onChange={ev=>this.toImport(ev)}/>
       </div>
       {/* 分界 */}
       <cpnt.InputWrap>
@@ -82,21 +95,18 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount(){
-    const [buffer, sText] = await Promise.all([fn.getMp3(), fn.getText()]);
-    const aWave = fn.getPeaks(buffer, 30);
-    const aTimeLine = fn.getTimeLine(sText).slice(0, 24);
-    const fCanvasWidth = aWave.length / 2; // 画布宽度
-    // console.log(`一秒${fCanvasWidth / buffer.duration}像素`);
-    this.setState({
-      buffer,
-      aWave,
-      aTimeLine,
-      fCanvasWidth,
-      duration: buffer.duration,
-      oneScPx: fCanvasWidth / buffer.duration,
-    });
-    this.toDraw();
-    this.watchKeyDown();
+    // const buffer = await fn.getMp3();
+    // const aWave = fn.getPeaks(buffer, 30);
+    // const fCanvasWidth = aWave.length / 2; // 画布宽度
+    // this.setState({
+    //   buffer,
+    //   aWave,
+    //   fCanvasWidth,
+    //   duration: buffer.duration,
+    //   oneScPx: fCanvasWidth / buffer.duration,
+    // });
+    // this.toDraw();
+    // this.watchKeyDown();
   }
 };
 

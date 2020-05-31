@@ -81,19 +81,3 @@ export function getPeaks(buffer, perSecPx) {
   return peaks;
 }
 
-export function funDownload(content, filename=`未命名-${new Date()+1}.txt`) {
-  // 字符内容转变成blob地址
-  var blob = new Blob([content]);
-  Object.assign(document.createElement('a'), {
-    download: filename,
-    href: URL.createObjectURL(blob),
-  }).click();
-  // 创建隐藏的可下载链接
-  var eleLink = document.createElement('a');
-  eleLink.download = filename;
-  eleLink.href = URL.createObjectURL(blob);
-  eleLink.click(); // 触发点击
-  // eleLink.style.display = 'none';
-  // document.body.appendChild(eleLink);
-  // document.body.removeChild(eleLink); // 然后移除
-};

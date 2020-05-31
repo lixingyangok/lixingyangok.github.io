@@ -6,6 +6,8 @@ import * as serviceWorker from './serviceWorker';
 import {mix} from './common/common.js';
 import lf from 'localforage';
 
+// ▼样式
+import 'antd/dist/antd.css';
 
 Object.defineProperties(window, {
   mix: {
@@ -19,9 +21,9 @@ Object.defineProperties(window, {
 });
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  // <React.StrictMode>
+    <App />,
+  // </React.StrictMode>,
   document.getElementById('root'),
 );
 

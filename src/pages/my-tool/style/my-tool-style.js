@@ -43,7 +43,7 @@ export const WaveWrap = styled.div`
     height: 100%;
     background: white;
     top: 0;
-    left: 100px;
+    left: 0;
     z-index: 9;
     /* transition-timing-function: linear !important; */
   }
