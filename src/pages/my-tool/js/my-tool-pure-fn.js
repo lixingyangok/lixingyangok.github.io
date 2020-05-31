@@ -1,19 +1,13 @@
 
-export async function getText() {
-  let res = await fetch('./static/Im Lost.srt', {
-    method: "get",
-    headers: {"Content-Type": "application/json"},
-    credentials: "same-origin",
-  });
-  return await res.text();
-};
 
+// ▼时间轴的时间转秒
 export function getSeconds(text) {
   const [hour, minute, second, tail] = text.match(/\d+/g);
   let number = (hour * 60 * 60) + (minute * 60) + `${second}.${tail}` * 1;
   return number.toFixed(2) * 1;
 };
 
+// ▼秒-转为时间轴的时间
 export function secToStr(fSecond){
   let iHour = Math.floor(fSecond / 3600) + ''; //时
   let iMinut = Math.floor((fSecond - iHour * 3600) / 60) + ''; //分
@@ -23,38 +17,7 @@ export function secToStr(fSecond){
   return sTime
 }
 
-export function getTimeLine(text, getArr) {
-  let strArr = text.split('\n');
-  const aLine = [];
-  strArr = strArr.filter((cur, idx) => {
-    const isTime = /\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/.test(cur);
-    if (!isTime) return false;
-    aLine.push(strArr[idx+1]);
-    return isTime;
-  });
-  return strArr.map((cur, idx) => {
-    const [aa, bb] = cur.split(' --> ');
-    const [start, end] = [getSeconds(aa), getSeconds(bb)];
-    return {
-      start_: aa,
-      end_: bb,
-      start,
-      end,
-      long: (end - start).toFixed(2) * 1,
-      text: aLine[idx].trim(),
-    };
-  });
-};
-
-export async function getMp3() {
-  const res = await fetch('./static/Im Lost.mp3');
-  const arrayBuffer = await res.arrayBuffer();
-  let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const buffer = await audioContext.decodeAudioData(arrayBuffer);
-  audioContext = null; // 如果不销毁audioContext对象的话，audio标签是无法播放的
-  return buffer; //getPeaks(buffer, 100); // 每秒44100个点分成100份
-};
-
+// ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx) {
   console.log('buffer', buffer);
   const {sampleRate, length} = buffer;
@@ -81,3 +44,45 @@ export function getPeaks(buffer, perSecPx) {
   return peaks;
 }
 
+
+
+export async function getMp3() {
+  const res = await fetch('./static/Im Lost.mp3');
+  const arrayBuffer = await res.arrayBuffer();
+  let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const buffer = await audioContext.decodeAudioData(arrayBuffer);
+  audioContext = null; // 如果不销毁audioContext对象的话，audio标签是无法播放的
+  return buffer; //getPeaks(buffer, 100); // 每秒44100个点分成100份
+};
+
+export async function getText() {
+  let res = await fetch('./static/Im Lost.srt', {
+    method: "get",
+    headers: {"Content-Type": "application/json"},
+    credentials: "same-origin",
+  });
+  return await res.text();
+};
+
+export function getTimeLine(text, getArr) {
+  let strArr = text.split('\n');
+  const aLine = [];
+  strArr = strArr.filter((cur, idx) => {
+    const isTime = /\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/.test(cur);
+    if (!isTime) return false;
+    aLine.push(strArr[idx+1]);
+    return isTime;
+  });
+  return strArr.map((cur, idx) => {
+    const [aa, bb] = cur.split(' --> ');
+    const [start, end] = [getSeconds(aa), getSeconds(bb)];
+    return {
+      start_: aa,
+      end_: bb,
+      start,
+      end,
+      long: (end - start).toFixed(2) * 1,
+      text: aLine[idx].trim(),
+    };
+  });
+};

@@ -16,6 +16,14 @@ export default class Tool extends window.mix(
   oSententList = React.createRef();
   constructor(props){
     super(props);
+    const oFirstLine = {
+      start_: '00:00:00,000',
+      end_: '00:00:09,000',
+      start: 0,
+      end: 9,
+      long: 9,
+      text: '',
+    };
     this.state = {
       buffer: {}, //音频数据
       aWave: [], //波形数据
@@ -25,16 +33,10 @@ export default class Tool extends window.mix(
       timer: null, //定时器1
       timer02: null, //定时器2
       iCurLine: 0, //当前行
-      aTimeLine: [{
-        start_: '00:00:00,000',
-        end_: '00:00:09,000',
-        start: 0,
-        end: 9,
-        long: 9,
-        text: '',
-      }], //字幕
-      fileName: '',
-      fileSrc: './static/Im Lost.mp3',
+      oFirstLine, //默认行
+      aTimeLine: [oFirstLine], //字幕
+      fileName: '', //文件名
+      fileSrc: '', //文件地址
     };
   }
   render() {

@@ -76,6 +76,7 @@ export default class{
   }
   async toSave(){
     const {aTimeLine, fileName} = this.state;
+    if (!fileName) return;
     window.lf.setItem(fileName, aTimeLine);
     message.success('保存成功');
   }
@@ -85,10 +86,11 @@ export default class{
     const previous = aTimeLine[iCurLine-1];
     const next = aTimeLine[iCurLine+1];
     let fNewVal = oOld[sKey] + iDirection;
-    if(previous && fNewVal < previous.end){
+    if (fNewVal < 0) fNewVal = 0;
+    if (previous && fNewVal < previous.end){
       fNewVal = previous.end + 0.1;
     }
-    if(next && fNewVal > next.start){
+    if (next && fNewVal > next.start){
       fNewVal = next.start - 0.1;
     }
     aTimeLine[iCurLine] = {...oOld, [sKey]: fNewVal};

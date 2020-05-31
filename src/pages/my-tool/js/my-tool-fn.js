@@ -102,7 +102,7 @@ export default class{
     let buffer = await this.fileToBuffer(file);
     this.showWaveByBuffer(buffer);
     let aTimeLine = await window.lf.getItem(fileName);
-    if (!aTimeLine) return;
+    aTimeLine = aTimeLine || [this.state.oFirstLine];
     this.setState({aTimeLine});
   }
   showWaveByBuffer(buffer){
