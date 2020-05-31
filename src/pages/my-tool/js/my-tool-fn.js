@@ -17,10 +17,17 @@ export default class{
   }
   goLine(idx) {
     const oBox = this.oBox.current;
+    const oSententList = this.oSententList.current;
     const {oneScPx, aTimeLine} = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx-1];
     const leftVal = oneScPx * oAim.start - 500;
+    const fHeight = (()=>{
+      const oneLineHeight = (oSententList.children[0] || {}).offsetHeight || 0;
+      return oneLineHeight * (idx - 2);
+    })();
+    console.log('fHeight', fHeight);
     oBox.scrollTo(leftVal, 0);
+    oSententList.scrollTo(0, fHeight);
   }
   toDraw(){
     const {aWave} = this.state;

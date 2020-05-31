@@ -1,29 +1,37 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import styled from "styled-components";
+
 const Ul = styled.ul`
+  height: 50px;
+  line-height: 50px;
   background: black;
   margin: 0;
-  padding: 15px 30px;
-  a {
+  display: flex;
+  li{
+    margin-right: 20px;
+  }
+  a{
+    display: block;
     color: white;
   }
 `;
 
 export default function () {
-  return (
-    <Ul>
-      <li>
-        <NavLink to="/index">首页</NavLink>
-        &emsp;
-        <NavLink to="/english">英语</NavLink>
-        &emsp;
-        <NavLink to="/english-2">英语-2</NavLink>
-        &emsp;
-        <NavLink to="/my-tool">工具</NavLink>
-        &emsp;
-        <NavLink to="/about">关于</NavLink>
-      </li>
+  const aNavData = [
+    {name: '首页', to: '/index'},
+    {name: '工具', to: '/my-tool'},
+    {name: '关于', to: '/about'},
+  ];
+  return <nav>
+     <Ul>
+      {aNavData.map((cur,idx)=>{
+        return <li key={idx}>
+          <NavLink to={cur.to}>
+            {cur.name}
+          </NavLink>
+        </li>
+      })}
     </Ul>
-  );
+  </nav>;
 }

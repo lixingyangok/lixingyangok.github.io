@@ -1,36 +1,23 @@
 import styled from "styled-components";
 
 export const Div = styled.div`
-  margin: 30px;
-  .sentence{
-    display: inline-block;
-    background: yellow;
-    margin: 5px 10px 0 0;
-    padding: 3px 10px;
-    border-radius: 3px;
-  }
-  .one-line{
-    line-height: 2;
-    &[class~=cur],
-    &:hover{
-      background: #eee;
-      cursor: pointer;
-    }
-  }
+  box-sizing: border-box;
+  padding: 30px;
+  height: calc(100vh - 50px);
+  display: flex;
+  flex-flow: column nowrap;
+
 `;
 
 export const WaveWrap = styled.div`
   width: 100%;
   height: 220px;
   background: black;
-  margin: 20px 0 0;
   overflow-x: auto;
   overflow-y: hidden;
   position: relative;
-  canvas{
-    /* height: 200px; */
-    outline: solid 1px blue;
-  }
+  flex: none;
+  canvas{}
   .sentence{
     box-sizing: border-box;
     position: absolute;
@@ -62,10 +49,53 @@ export const WaveWrap = styled.div`
   }
 `;
 
-export const Textarea = styled.textarea`
-  box-sizing: border-box;
-  width: 100%;
-  height: 90px;
-  padding: 15px;
-  font-size: 20px;
+export const Region = styled.span`
+  display: inline-block;
+  background: yellow;
+  margin: 5px 10px 0 0;
+  padding: 3px 10px;
+  border-radius: 3px;
+`;
+
+export const InputWrap = styled.div`
+  height: 100px;
+  margin: 25px 0;
+  flex: none;
+  textarea{
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    font-size: 20px;
+  }
+`;
+
+export const SentenceWrap = styled.ol`
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  .one-line{
+    line-height: 2.2;
+    border-top: solid 1px #aaa;
+    padding: 0 10px;
+    &[class~=cur],
+    &:hover{
+      background: #ceffe7;
+      cursor: pointer;
+    }
+  }
+  .idx{
+    display: inline-block;
+    width: 3em;
+    font-style: normal;
+  }
+  .time{
+    margin-right: 1em;
+    em{
+      display: inline-block;
+      width: 50px;
+      font-style: normal;
+    }
+  }
 `;

@@ -3,34 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import {mix} from './common/common.js';
 
 Object.defineProperty(window, 'mix', {
   writable: false,
-  value: function mix(...mixins) {
-    function copyProperties(target, source) {
-      for (let key of Reflect.ownKeys(source)) {
-        if ( key !== 'constructor'
-          && key !== 'prototype'
-          && key !== 'name'
-        ) {
-          let desc = Object.getOwnPropertyDescriptor(source, key);
-          Object.defineProperty(target, key, desc);
-        }
-      }
-    }
-    class Mix {
-      constructor() {
-        for (let mixin of mixins) {
-          copyProperties(this, new mixin()); // 拷贝实例属性
-        }
-      }
-    }
-    for (let mixin of mixins) {
-      copyProperties(Mix, mixin); // 拷贝静态属性
-      copyProperties(Mix.prototype, mixin.prototype); // 拷贝原型属性
-    }
-    return Mix;
-  },
+  value: mix,
 });
 
 ReactDOM.render(
