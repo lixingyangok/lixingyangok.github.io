@@ -4,10 +4,18 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {mix} from './common/common.js';
+import lf from 'localforage';
 
-Object.defineProperty(window, 'mix', {
-  writable: false,
-  value: mix,
+
+Object.defineProperties(window, {
+  mix: {
+    writable: false,
+    value: mix,
+  },
+  lf: {
+    writable: false,
+    value: lf,
+  },
 });
 
 ReactDOM.render(

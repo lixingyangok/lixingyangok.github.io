@@ -2,10 +2,12 @@ import React from "react";
 import * as fn from './js/my-tool.js';
 import * as cpnt from './style/my-tool-style.js';
 import theFn from './js/my-tool-fn.js';
+import keyDownFn from './js/key-down-fn.js';
 
-export default class extends window.mix(
+export default class Tool extends window.mix(
   React.Component,
   theFn,
+  keyDownFn,
 ){
   oCanvas = React.createRef();
   oAudio = React.createRef();
@@ -28,21 +30,25 @@ export default class extends window.mix(
   }
   render() {
     const {state} = this;
-    const {oneScPx, aTimeLine, iCurLine} = state;
+    const {oneScPx, aTimeLine, iCurLine, fCanvasWidth} = state;
     return <cpnt.Div>
       <audio src="./static/Im Lost.mp3" ref={this.oAudio}/>
       <cpnt.WaveWrap ref={this.oBox}>
-        <canvas width={state.fCanvasWidth} height={200} ref={this.oCanvas}/>
+        <canvas width={fCanvasWidth} height={200} ref={this.oCanvas}/>
         <i className="pointer" ref={this.oPointer} />
-        {state.aTimeLine.map((cur,idx)=>{
+        {aTimeLine.map(({start, end},idx)=>{
           return <cpnt.Region className={idx===iCurLine ? 'cur sentence' : 'sentence'} key={idx}
-            style={{left: `${cur.start * oneScPx}px`, width: `${cur.long * oneScPx}px`}}
+            style={{left: `${start * oneScPx}px`, width: `${(end - start) * oneScPx}px`}}
             onClick={()=>this.toPlay(idx)}
           >
             {idx+1}
           </cpnt.Region>
         })}
       </cpnt.WaveWrap>
+      <div>
+        <button onClick={()=>this.toExport()}>保存</button>
+        <button onClick={()=>this.toExport()}>导出</button>
+      </div>
       {/* 分界 */}
       <cpnt.InputWrap>
         {(()=>{
@@ -55,15 +61,18 @@ export default class extends window.mix(
       </cpnt.InputWrap>
       {/* 分界 */}
       <cpnt.SentenceWrap ref={this.oSententList}>
-        {state.aTimeLine.map((cur, idx)=>{
+        {aTimeLine.map((cur, idx)=>{
           return <li key={idx}
             onClick={()=>this.toPlay(idx)}
             className={`one-line ${idx===iCurLine ? 'cur' : ''}`}
           >
-            <i className="idx" >{idx+1}</i>
+            <i className="idx" 
+              style={{width: `${String(aTimeLine.length || 0).length}em`}}
+            >
+              {idx+1}
+            </i>
             <span className="time" >
-              <em>{cur.start}</em>-&emsp;
-              <em>{cur.end}</em>
+              <em>{cur.start_}</em>&nbsp;-&nbsp;<em>{cur.end_}</em>
             </span>
             {cur.text}
           </li>

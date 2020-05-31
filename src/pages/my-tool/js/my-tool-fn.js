@@ -1,13 +1,5 @@
 
 export default class{
-  enterKeyDown(ev){
-    const {keyCode, altKey, ctrlKey, shiftKey} = ev;
-    if (keyCode===13 && !altKey && !ctrlKey && !shiftKey) {
-      ev.preventDefault();
-      this.upAndDown(1);
-      return false;
-    }
-  }
   valChanged(ev){
     const text = ev.target.value;
     if(!text[0] || !text[text.length-1]) return;
@@ -15,18 +7,23 @@ export default class{
     aTimeLine[iCurLine].text = text;
     this.setState({aTimeLine});
   }
-  goLine(idx) {
+  async goLine(idx) {
+    await new Promise(resolve=>resolve(), 100);
     const oBox = this.oBox.current;
-    const oSententList = this.oSententList.current;
     const {oneScPx, aTimeLine} = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx-1];
     const leftVal = oneScPx * oAim.start - 500;
+    oBox.scrollTo(leftVal, 0);
+    // 分界
+    const oSententList = this.oSententList.current;
     const fHeight = (()=>{
       const oneLineHeight = (oSententList.children[0] || {}).offsetHeight || 0;
+      // if(idx > aTimeLine.length - 4){
+      //   console.log('快到底了', oneLineHeight * (idx + 6));
+      //   return oneLineHeight * (idx + 6);
+      // }
       return oneLineHeight * (idx - 2);
     })();
-    console.log('fHeight', fHeight);
-    oBox.scrollTo(leftVal, 0);
     oSententList.scrollTo(0, fHeight);
   }
   toDraw(){
@@ -73,44 +70,15 @@ export default class{
     this.setState({timer, timer02, iCurLine});
     this.goLine(iCurLine);
   }
-  upAndDown(iDirection){
-    const {aTimeLine, iCurLine} = this.state;
-    let iCurLineNew = iCurLine + iDirection;
-    if (iCurLineNew<0) iCurLineNew = 0;
-    if (iCurLineNew>aTimeLine.length-1) {
-      const oLast = aTimeLine.slice(-1)[0];
-      const oNewItem = {
-        start: oLast.end + 0.1,
-        end: oLast.end + 10,
-        long: (10.1).toFixed(2) * 1,
-        text: `新的${iCurLineNew}`,
-      };
-      this.setState({
-        aTimeLine: [...aTimeLine, oNewItem],
-      });
-    };
-    console.log('下一个', iCurLineNew);
-    this.setState({iCurLine: iCurLineNew});
-    this.goLine(iCurLineNew);
-  }
-  watchKeyDown(){
-    const fnLib = {
-      '74': ()=>this.upAndDown(-1), // Ctrl + j
-      '75': ()=>this.upAndDown(1), // Ctrl + k
-      '13': ()=>this.toPlay(), //enter
-    }
-    const toRunFn = ev => {
-      const {keyCode, altKey, ctrlKey, shiftKey} = ev;
-      const aWatchedKeyDown = [
-        (altKey && ctrlKey && shiftKey),
-        [74, 75].includes(keyCode) && ctrlKey, // j、k
-        keyCode===13 && ctrlKey, // enter
-      ];
-      if (!aWatchedKeyDown.some(Boolean)) return;
-      const theFn = fnLib[keyCode] || (xx=>xx);
-      theFn.bind(this)();
-      ev.preventDefault();
-    }
-    document.onkeydown = toRunFn;
+  toExport(){
+    const {aTimeLine} = this.state;
+    const aStr = aTimeLine.map(({start_, end_, text}, idx)=>{
+      return `${idx+1}\n${start_} --> ${end_}\n${text}\n`;
+    });
+    const blob = new Blob([aStr.join('\n')]);
+    Object.assign(document.createElement('a'), {
+      download: `字幕文件-${new Date()*1}.srt`,
+      href: URL.createObjectURL(blob),
+    }).click();
   }
 }

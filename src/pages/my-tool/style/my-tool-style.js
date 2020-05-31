@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Div = styled.div`
   box-sizing: border-box;
-  padding: 30px;
+  padding: 20px 40px 60px;
   height: calc(100vh - 50px);
   display: flex;
   flex-flow: column nowrap;
@@ -58,14 +58,14 @@ export const Region = styled.span`
 `;
 
 export const InputWrap = styled.div`
-  height: 100px;
+  height: 90px;
   margin: 25px 0;
   flex: none;
   textarea{
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    padding: 15px;
+    padding: 10px;
     font-size: 20px;
   }
 `;
@@ -75,10 +75,12 @@ export const SentenceWrap = styled.ol`
   list-style: none;
   padding: 0;
   margin: 0;
+  border-bottom: solid 1px #aaa;
   .one-line{
-    line-height: 2.2;
+    line-height: 2;
     border-top: solid 1px #aaa;
     padding: 0 10px;
+    display: flex;
     &[class~=cur],
     &:hover{
       background: #ceffe7;
@@ -86,15 +88,17 @@ export const SentenceWrap = styled.ol`
     }
   }
   .idx{
-    display: inline-block;
-    width: 3em;
+    flex: none;
     font-style: normal;
+    text-align: center;
   }
   .time{
-    margin-right: 1em;
+    flex: none;
+    border: solid 1px #aaa;
+    border-width: 0 1px;
+    padding: 0 0.6em;
+    margin: 0 0.6em;
     em{
-      display: inline-block;
-      width: 50px;
       font-style: normal;
     }
   }

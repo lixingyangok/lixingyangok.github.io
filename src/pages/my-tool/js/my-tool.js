@@ -1,15 +1,8 @@
-// let res = await fn.getText();
-// let regions = fn.getTimeLine(res);
-// var plugins = [];
-// plugins.push(WaveSurfer.regions.create({
-//   regions,
-//   drag: false,
-// }));
 
 export async function getText() {
   let res = await fetch('./static/Im Lost.srt', {
     method: "get",
-    headers: { "Content-Type": "application/json" },
+    headers: {"Content-Type": "application/json"},
     credentials: "same-origin",
   });
   return await res.text();
@@ -21,11 +14,20 @@ export function getSeconds(text) {
   return number.toFixed(2) * 1;
 };
 
+export function secToStr(fSecond){
+  let iHour = Math.floor(fSecond / 3600) + ''; //时
+  let iMinut = Math.floor((fSecond - iHour * 3600) / 60) + ''; //分
+  let fSec = fSecond - (iHour*3600 + iMinut*60) + ''; //秒
+  let [sec01, sec02='000'] = fSec.split('.');
+  const sTime = `${iHour.padStart(2, 0)}:${iMinut.padStart(2, 0)}:${sec01.padStart(2, 0)},${sec02.slice(0, 3).padEnd(3,0)}`;
+  return sTime
+}
+
 export function getTimeLine(text, getArr) {
   let strArr = text.split('\n');
   const aLine = [];
   strArr = strArr.filter((cur, idx) => {
-    const isTime = /\d{2}:\d{2}:\d{2},\d{3,4} --> \d{2}:\d{2}:\d{2},\d{3,4}/.test(cur);
+    const isTime = /\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/.test(cur);
     if (!isTime) return false;
     aLine.push(strArr[idx+1]);
     return isTime;
@@ -34,6 +36,8 @@ export function getTimeLine(text, getArr) {
     const [aa, bb] = cur.split(' --> ');
     const [start, end] = [getSeconds(aa), getSeconds(bb)];
     return {
+      start_: aa,
+      end_: bb,
       start,
       end,
       long: (end - start).toFixed(2) * 1,
@@ -76,3 +80,20 @@ export function getPeaks(buffer, perSecPx) {
   }
   return peaks;
 }
+
+export function funDownload(content, filename=`未命名-${new Date()+1}.txt`) {
+  // 字符内容转变成blob地址
+  var blob = new Blob([content]);
+  Object.assign(document.createElement('a'), {
+    download: filename,
+    href: URL.createObjectURL(blob),
+  }).click();
+  // 创建隐藏的可下载链接
+  var eleLink = document.createElement('a');
+  eleLink.download = filename;
+  eleLink.href = URL.createObjectURL(blob);
+  eleLink.click(); // 触发点击
+  // eleLink.style.display = 'none';
+  // document.body.appendChild(eleLink);
+  // document.body.removeChild(eleLink); // 然后移除
+};
