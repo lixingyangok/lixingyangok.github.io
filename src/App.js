@@ -1,29 +1,11 @@
 import React, {Suspense} from 'react';
-import { NavLink } from 'react-router-dom';
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
-import styled from 'styled-components';
-const Li = styled.li`
-  color: red;
-  .active{
-    background: yellow;
-  }
-`;
+import Navigation from './common/components/navigation.jsx';
+
 
 function App() {
   return <BrowserRouter>
-    <ul>
-      <Li>
-        <NavLink to='/index' >首页</NavLink>
-        &emsp;
-        <NavLink to='/english' >英语</NavLink>
-        &emsp;
-        <NavLink to='/english-2' >英语-2</NavLink>
-        &emsp;
-        <NavLink to='/my-tool' >工具</NavLink>
-        &emsp;
-        <NavLink to='/about' >关于</NavLink>
-      </Li>
-    </ul>
+    <Navigation/>
     {/* ▼异步组件父级必须有 Suspense */}
     <Suspense fallback={<div>Loading...</div>}>
       <Switch>
@@ -37,7 +19,6 @@ function App() {
     </Suspense>
   </BrowserRouter>
 }
-
 
 export default App;
 

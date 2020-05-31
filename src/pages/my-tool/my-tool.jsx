@@ -1,6 +1,6 @@
 import React from "react";
 import * as fn from './js/my-tool.js';
-import {Div, MyBox, Textarea} from './style/my-tool-style.js';
+import * as cpnt from './style/my-tool-style.js';
 import theFn from './js/my-tool-fn.js';
 
 export default class extends window.mix(
@@ -16,25 +16,22 @@ export default class extends window.mix(
     this.state = {
       buffer: {}, //音频数据
       aWave: [], //波形数据
-      iWidth: 0,
-      aTimeLine: [], //
-      duration: 0,
-      oneScPx: 0,
-      timer: null,
-      timer02: null,
-      iCurLine: 1,
-      speed: 1,
-      left: 100,
-      sCurStr: '',
+      fCanvasWidth: 0, //画布宽
+      aTimeLine: [], //字幕
+      duration: 0, //音频长度（秒
+      oneScPx: 0, //一秒种的
+      timer: null, //定时器1
+      timer02: null, //定时器2
+      iCurLine: 1, //当前行
     };
   }
   render() {
     const {state} = this;
     const {oneScPx, aTimeLine, iCurLine} = state;
-    return <Div>
-      <audio controls="controls" src="./static/Im Lost.mp3" ref={this.oAudio}/>
-      <MyBox ref={this.oBox}>
-        <canvas width={state.iWidth} height={200} ref={this.oCanvas}/>
+    return <cpnt.Div>
+      <audio src="./static/Im Lost.mp3" ref={this.oAudio}/>
+      <cpnt.WaveWrap ref={this.oBox}>
+        <canvas width={state.fCanvasWidth} height={200} ref={this.oCanvas}/>
         <i className="pointer" ref={this.oPointer} />
         {state.aTimeLine.map((cur,idx)=>{
           return <span className={idx===iCurLine ? 'cur sentence' : 'sentence'} key={idx}
@@ -44,17 +41,17 @@ export default class extends window.mix(
             {idx+1}
           </span>
         })}
-      </MyBox>
+      </cpnt.WaveWrap>
       <br/><br/>
       <div>
         {(()=>{
           if (!aTimeLine[iCurLine]) return <span/>;
-          return <Textarea onChange={ev => this.valChanged(ev)}
+          return <cpnt.Textarea onChange={ev => this.valChanged(ev)}
             value={(aTimeLine[iCurLine] || {}).text}
             onKeyDown={ev=>this.enterKeyDown(ev)}
           >
             123
-          </Textarea>
+          </cpnt.Textarea>
         })()}
       </div>
       <ol>
@@ -67,24 +64,26 @@ export default class extends window.mix(
           </li>
         })}
       </ol>
-    </Div>
+    </cpnt.Div>
   }
+  // ▼以下是生命周期
   async componentDidMount(){
     const [buffer, sText] = await Promise.all([fn.getMp3(), fn.getText()]);
     const aWave = fn.getPeaks(buffer, 30);
     const aTimeLine = fn.getTimeLine(sText).slice(0, 4);
-    const iWidth = aWave.length / 2; // 画布宽度
-    // console.log(`一秒${iWidth / buffer.duration}像素`);
+    const fCanvasWidth = aWave.length / 2; // 画布宽度
+    // console.log(`一秒${fCanvasWidth / buffer.duration}像素`);
     this.setState({
       buffer,
       aWave,
       aTimeLine,
-      iWidth,
+      fCanvasWidth,
       duration: buffer.duration,
-      oneScPx: iWidth / buffer.duration,
+      oneScPx: fCanvasWidth / buffer.duration,
     });
     this.toDraw();
     this.watchKeyDown();
   }
 };
+
 

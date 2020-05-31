@@ -10,14 +10,12 @@ export default class{
   }
   valChanged(ev){
     const text = ev.target.value;
-    console.log('尾字符', text, /.+\s+$/.test(text));
-    if(/.+\s+$/.test(text)) return;
+    if(!text[0] || !text[text.length-1]) return;
     const {iCurLine, aTimeLine} = this.state;
-    aTimeLine[iCurLine] = {...aTimeLine[iCurLine], text};
+    aTimeLine[iCurLine].text = text;
     this.setState({aTimeLine});
   }
   goLine(idx) {
-    // debugger;
     const oBox = this.oBox.current;
     const {oneScPx, aTimeLine} = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx-1];

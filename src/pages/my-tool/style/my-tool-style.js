@@ -19,7 +19,7 @@ export const Div = styled.div`
   }
 `;
 
-export const MyBox = styled.div`
+export const WaveWrap = styled.div`
   width: 100%;
   height: 220px;
   background: black;
