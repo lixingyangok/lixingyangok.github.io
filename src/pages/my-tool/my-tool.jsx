@@ -2,6 +2,7 @@ import React from "react";
 import * as cpnt from './style/my-tool-style.js';
 import theFn from './js/my-tool-fn.js';
 import keyDownFn from './js/key-down-fn.js';
+import * as fn from './js/my-tool-pure-fn.js';
 import {Button} from 'antd';
 
 export default class Tool extends window.mix(
@@ -27,7 +28,6 @@ export default class Tool extends window.mix(
     this.state = {
       buffer: {}, //音频数据
       aWave: [], //波形数据
-      fCanvasWidth: 0, //画布宽
       duration: 0, //音频长度（秒
       oneScPx: 0, //一秒种的
       timer: null, //定时器1
@@ -37,15 +37,20 @@ export default class Tool extends window.mix(
       aTimeLine: [oFirstLine], //字幕
       fileName: '', //文件名
       fileSrc: '', //文件地址
+      perSecPx: 10,
+      isDrawing: false,
     };
   }
   render() {
     const {state} = this;
-    const {oneScPx, aTimeLine, iCurLine, fCanvasWidth, fileSrc} = state;
+    const {oneScPx, aTimeLine, iCurLine, fileSrc} = state;
     return <cpnt.Div>
-      <audio src={fileSrc} ref={this.oAudio}/>
-      <cpnt.WaveWrap ref={this.oBox}>
-        <canvas width={fCanvasWidth} height={200} ref={this.oCanvas}/>
+      {/* <audio src={fileSrc} ref={this.oAudio}/> */}
+      <audio src='./static/Im Lost.mp3' ref={this.oAudio}/>
+      <cpnt.WaveWrap ref={this.oBox}
+        onWheel={(ev) => this.onWheelFn(ev)}
+      >
+        <canvas  height={200} ref={this.oCanvas}/>
         <i className="pointer" ref={this.oPointer} />
         {aTimeLine.map(({start, end},idx)=>{
           return <cpnt.Region className={idx===iCurLine ? 'cur sentence' : 'sentence'} key={idx}
@@ -97,18 +102,16 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount(){
-    // const buffer = await fn.getMp3();
-    // const aWave = fn.getPeaks(buffer, 30);
-    // const fCanvasWidth = aWave.length / 2; // 画布宽度
-    // this.setState({
-    //   buffer,
-    //   aWave,
-    //   fCanvasWidth,
-    //   duration: buffer.duration,
-    //   oneScPx: fCanvasWidth / buffer.duration,
-    // });
-    // this.toDraw();
-    // this.watchKeyDown();
+    const buffer = await fn.getMp3();
+    const aWave = fn.getPeaks(buffer, this.state.perSecPx);
+    this.setState({
+      buffer,
+      aWave,
+      duration: buffer.duration,
+      oneScPx: aWave.length / 2 / buffer.duration,
+    });
+    this.toDraw();
+    this.watchKeyDown();
   }
 };
 

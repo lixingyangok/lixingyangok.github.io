@@ -19,7 +19,8 @@ export function secToStr(fSecond){
 
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx) {
-  console.log('buffer', buffer);
+  // console.log('buffer', buffer);
+  console.time("计算波形");
   const {sampleRate, length} = buffer;
   const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数：44100 / 100 = 441
   const last = ~~(length / sampleSize)
@@ -28,23 +29,23 @@ export function getPeaks(buffer, perSecPx) {
   let idx = -1;
   while (idx <= last) {
     idx++;
-    const start = idx * sampleSize;
-    const end = start + sampleSize;
+    let start = idx * sampleSize;
+    let end = start + sampleSize;
     let min = 0;
     let max = 0;
-    for (let j = start; j < end; j++) {
-      const value = chan[j];
+    while (start < end) {
+      const value = chan[start];
       if (value > max) max = value;
       else if (value < min) min = value;
+      start++;
     }
     const height = 90;
     peaks[2 * idx] = max * height; // 波峰
     peaks[2 * idx + 1] = min * height; // 波谷
   }
+  console.timeEnd("计算波形");
   return peaks;
 }
-
-
 
 export async function getMp3() {
   const res = await fetch('./static/Im Lost.mp3');

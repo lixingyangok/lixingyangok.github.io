@@ -3,9 +3,9 @@
 const {
   override,
   overrideDevServer,
-  addLessLoader,
-  addPostcssPlugins,
-  fixBabelImports,
+  // addLessLoader,
+  // addPostcssPlugins,
+  // fixBabelImports,
 } = require('customize-cra');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 

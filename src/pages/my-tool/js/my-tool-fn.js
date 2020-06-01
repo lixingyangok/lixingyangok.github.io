@@ -24,12 +24,18 @@ export default class{
     oSententList.scrollTo(0, fHeight);
   }
   toDraw(){
+    console.time('画波形');
     const {aWave} = this.state;
     const oCanvas = this.oCanvas.current;
     const Context = oCanvas.getContext('2d');
+    const {width, height} = oCanvas;
+    oCanvas.width = aWave.length / 2;
+    // Context.clearRect(0, 0, width, height);
+    Context.fillStyle = 'black';
+    Context.fillRect(0, 0, width, height);
     let idx = -1;
-    let width = aWave.length / 2;
-    while(idx<width){
+    let fCanvasWidth = aWave.length / 2;
+    while (idx < fCanvasWidth) {
       idx++;
       const cur1 = aWave[idx * 2];
       const cur2 = aWave[idx * 2 + 1];
@@ -40,6 +46,8 @@ export default class{
       Context.fillStyle = '#4ddc4d';
       Context.fillRect(idx, 100, 1, 1);
     }
+    console.timeEnd('画波形');
+    this.setState({isDrawing: false});
     return oCanvas;
   }
   async toPlay(iCurLine){

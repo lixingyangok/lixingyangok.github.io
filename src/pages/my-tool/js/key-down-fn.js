@@ -96,4 +96,51 @@ export default class{
     aTimeLine[iCurLine] = {...oOld, [sKey]: fNewVal};
     this.setState({aTimeLine});
   }
+  onWheelFn(ev){
+    const {altKey, ctrlKey, shiftKey, nativeEvent} = ev;
+    if (0) console.log(ctrlKey, shiftKey);
+    if (altKey){
+      this.zoomWave(nativeEvent.deltaY);
+    }else{
+      this.scrollToFn(nativeEvent.deltaY);
+    }
+  }
+  scrollToFn(deltaY){
+    const oDom = this.oBox.current;
+    const newVal = (()=>{
+      let oldVal = oDom.scrollLeft;
+      if (deltaY <= 0) return oldVal - 55;
+      else return oldVal + 55;
+    })();
+    oDom.scrollTo(newVal, 0);
+  }
+  zoomWave(deltaY){
+    const {perSecPx, buffer, isDrawing, duration} = this.state;
+    if (isDrawing) return console.error('防抖退出'); //防抖
+    this.setState({isDrawing: true});
+    let newVal = (()=>{
+      let iDirection = deltaY <= 0 ? 2 : -2;
+      let result = perSecPx + iDirection;
+      if (result<3) result=3;
+      return result;
+    })();
+    const aWave = fn.getPeaks(buffer, newVal);
+    const fCanvasWidth = aWave.length / 2;
+    console.log(`一共${duration}秒 * 每秒像素${newVal} = ${~~fCanvasWidth}`);
+    if (fCanvasWidth > 32000){
+      this.setState({isDrawing: false});
+      return console.error('超过32000');
+    } else if (fCanvasWidth < 500){
+      this.setState({isDrawing: false});
+      return console.error('小于500');
+    }
+    // Chrome里面canvas的最大宽度是：32767px;
+    // Firefox里面canvas的最大宽度是：32766px;
+    this.setState({
+      aWave,
+      perSecPx: newVal,
+    });
+    this.toDraw();
+  }
 }
+
