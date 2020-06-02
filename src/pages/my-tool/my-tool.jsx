@@ -1,6 +1,6 @@
 import React from "react";
 import * as cpnt from './style/my-tool-style.js';
-import theFn from './js/my-tool-fn.js';
+import theFn from './js/my-tool.js';
 import keyDownFn from './js/key-down-fn.js';
 import * as fn from './js/my-tool-pure-fn.js';
 import {Button} from 'antd';

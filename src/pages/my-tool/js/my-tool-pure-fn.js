@@ -20,10 +20,10 @@ export function secToStr(fSecond){
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx) {
   // console.log('buffer', buffer);
-  console.time("计算波形");
+  console.time("算波形");
   const {sampleRate, length} = buffer;
-  const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数：44100 / 100 = 441
-  const last = ~~(length / sampleSize)
+  const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数= 44100 / 100 = 441
+  const last = ~~(length / sampleSize);
   const peaks = [];
   const chan = buffer.getChannelData(0);
   let idx = -1;
@@ -43,7 +43,7 @@ export function getPeaks(buffer, perSecPx) {
     peaks[2 * idx] = max * height; // 波峰
     peaks[2 * idx + 1] = min * height; // 波谷
   }
-  console.timeEnd("计算波形");
+  console.timeEnd("算波形");
   return peaks;
 }
 

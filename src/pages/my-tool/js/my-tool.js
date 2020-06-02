@@ -125,7 +125,5 @@ export default class{
     });
     this.toDraw();
     this.watchKeyDown();
-    
   }
-
 }
