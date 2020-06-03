@@ -38,12 +38,12 @@ export default class Tool extends window.mix(
       fileName: '', //文件名
       fileSrc: '', //文件地址
       perSecPx: 10,
-      isDrawing: false,
+      iHeight : 50,
     };
   }
   render() {
     const {state} = this;
-    const {oneScPx, aTimeLine, iCurLine, fileSrc} = state;
+    const {oneScPx, aTimeLine, iCurLine} = state;
     return <cpnt.Div>
       {/* <audio src={fileSrc} ref={this.oAudio}/> */}
       <audio src='./static/Im Lost.mp3' ref={this.oAudio}/>

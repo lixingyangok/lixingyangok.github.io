@@ -97,12 +97,14 @@ export default class{
     this.setState({aTimeLine});
   }
   onWheelFn(ev){
-    const {altKey, ctrlKey, shiftKey, nativeEvent} = ev;
+    const {altKey, ctrlKey, shiftKey, nativeEvent:{deltaY}} = ev;
     if (0) console.log(ctrlKey, shiftKey);
     if (altKey){
-      this.zoomWave(nativeEvent.deltaY);
+      this.zoomWave(deltaY);
+    }else if(altKey && shiftKey){
+      this.scrollToFn(deltaY);
     }else{
-      this.scrollToFn(nativeEvent.deltaY);
+      this.changeWaveHeigh(deltaY);
     }
   }
   scrollToFn(deltaY){
@@ -115,9 +117,7 @@ export default class{
     oDom.scrollTo(newVal, 0);
   }
   zoomWave(deltaY){
-    const {perSecPx, buffer, isDrawing, duration} = this.state;
-    if (isDrawing) return console.error('防抖退出'); //防抖
-    this.setState({isDrawing: true});
+    const {perSecPx, buffer, duration} = this.state;
     let newVal = (()=>{
       let iDirection = deltaY <= 0 ? 2 : -2;
       let result = perSecPx + iDirection;
@@ -128,18 +128,28 @@ export default class{
     const fCanvasWidth = aWave.length / 2;
     console.log(`一共${duration}秒 * 每秒像素${newVal} = ${~~fCanvasWidth}`);
     if (fCanvasWidth > 32000){
-      this.setState({isDrawing: false});
       return console.error('超过32000');
     } else if (fCanvasWidth < 500){
-      this.setState({isDrawing: false});
       return console.error('小于500');
     }
-    // Chrome里面canvas的最大宽度是：32767px;
-    // Firefox里面canvas的最大宽度是：32766px;
+    // canvas的最大宽度是：Chrome=32767px, Firefox=32766px;
     this.setState({
       aWave,
       perSecPx: newVal,
     });
+    this.toDraw();
+  }
+  changeWaveHeigh(deltaY){
+    let {iHeight} = this.state;
+    const min = 10;
+    const max = 400;
+    const iStep = 20;
+    if (deltaY <= 0) iHeight += iStep;
+    else iHeight -= iStep;
+    if (iHeight < min) iHeight = min;
+    if (iHeight > max) iHeight = max;
+    console.log('新高度', iHeight);
+    this.setState({iHeight});
     this.toDraw();
   }
 }

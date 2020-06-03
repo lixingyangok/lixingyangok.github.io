@@ -19,11 +19,15 @@ export function secToStr(fSecond){
 
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx) {
-  // console.log('buffer', buffer);
+  // AudioBuffer.sampleRate  // 采样率：浮点数，单位为 sample/s
+  // AudioBuffer.length  // 采样帧率：整形
+  // AudioBuffer.duration  // 时长：双精度型（单位为秒）
+  // AudioBuffer.numberOfChannels  // 通道数：整形
+  console.log('buffer', buffer);
   console.time("算波形");
   const {sampleRate, length} = buffer;
-  const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数= 44100 / 100 = 441
-  const last = ~~(length / sampleSize);
+  const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
+  const last = ~~(length / sampleSize); //遍历的次数
   const peaks = [];
   const chan = buffer.getChannelData(0);
   let idx = -1;
@@ -39,9 +43,8 @@ export function getPeaks(buffer, perSecPx) {
       else if (value < min) min = value;
       start++;
     }
-    const height = 90;
-    peaks[2 * idx] = max * height; // 波峰
-    peaks[2 * idx + 1] = min * height; // 波谷
+    peaks[2 * idx] = max; // 波峰
+    peaks[2 * idx + 1] = min; // 波谷
   }
   console.timeEnd("算波形");
   return peaks;
