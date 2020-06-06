@@ -14,6 +14,7 @@ function App() {
         <Route path="/english" component={React.lazy(() => import('./pages/english/english.jsx'))} />
         <Route path="/english-2" component={React.lazy(() => import('./pages/english-2/english.jsx'))} />
         <Route path="/my-tool" component={React.lazy(() => import('./pages/my-tool/my-tool.jsx'))} />
+        <Route path="/my-tool-2" component={React.lazy(() => import('./pages/my-tool-2/my-tool.jsx'))} />
         <Route path="/about" component={React.lazy(() => import('./pages/about/about.jsx'))} />
       </Switch>
     </Suspense>

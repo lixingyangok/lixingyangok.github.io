@@ -20,7 +20,7 @@ const Ul = styled.ul`
 export default function () {
   const aNavData = [
     {name: '首页', to: '/index'},
-    {name: '工具', to: '/my-tool'},
+    {name: '工具', to: '/my-tool-2'},
     {name: '关于', to: '/about'},
   ];
   return <nav>
