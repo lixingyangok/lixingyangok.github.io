@@ -6,7 +6,6 @@ export const Div = styled.div`
   height: calc(100vh - 50px);
   display: flex;
   flex-flow: column nowrap;
-
 `;
 
 export const WaveWrap = styled.div`
@@ -47,14 +46,17 @@ export const WaveWrap = styled.div`
     z-index: 9;
     /* transition-timing-function: linear !important; */
   }
-  .length{
-    height: 1px;
-  }
   canvas{
     position: absolute;
     top: 0;
     left: 0;
   }
+`;
+
+export const TimeBar = styled.div`
+  position: relative;
+  height: 100%;
+  background: rgba(0,0,0,0.1);
 `;
 
 export const BtnBar = styled.div`

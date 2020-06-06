@@ -153,21 +153,19 @@ export default class{
     const left = ev.target.scrollLeft;
     oCanvas.style.left = left + 'px';
     const {buffer, perSecPx} = this.state;
-    const oWaveWrap = this.oWaveWrap.current;
-    const aWave = fn.getPeaks(buffer, perSecPx, left, oWaveWrap.offsetWidth);
-    this.setState({aWave});
+    const {offsetWidth} = this.oWaveWrap.current;
+    const {aPeaks} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
+    this.setState({aPeaks});
     this.toDraw();
-    // console.log(oCanvas);
-    // console.log('滚动了', ev.target.scrollLeft);
   }
   onWheelFn(ev){
     const {altKey, ctrlKey, shiftKey, nativeEvent:{deltaY}} = ev;
     if (0) console.log(ctrlKey, shiftKey);
-    if (altKey){
+    if (altKey) {
       this.zoomWave(deltaY);
-    }else if(ctrlKey){
+    } else if (ctrlKey){
       // this.changeWaveHeigh(deltaY);
-    }else{
+    } else {
       this.scrollToFn(deltaY);
     }
   }

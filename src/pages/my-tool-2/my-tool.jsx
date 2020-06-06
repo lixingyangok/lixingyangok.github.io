@@ -27,26 +27,26 @@ export default class Tool extends window.mix(
     };
     this.state = {
       buffer: {}, //音频数据
-      aWave: [], //波形数据
+      aPeaks: [], //波形数据
       duration: 0, //音频长度（秒
       oneScPx: 0, //一秒种的
       timer: null, //定时器1
       timer02: null, //定时器2
-      iCurLine: 0, //当前行
+      iCurLine: 1, //当前行
       oFirstLine, //默认行
       aTimeLine: [oFirstLine], //字幕
       fileName: '', //文件名
       fileSrc: '', //文件地址
-      perSecPx: 10,
+      perSecPx: 110,
       iHeight : 50,
-      iCanvasWidth: 0, //画布总宽
+      iTimeBarWidth: 0, //画布总宽
       iCanvasHeight: 160,
     };
   }
   render() {
     const {
       oneScPx, aTimeLine, iCurLine,
-      iCanvasWidth, iCanvasHeight,
+      iTimeBarWidth, iCanvasHeight,
     } = this.state;
     return <cpnt.Div>
       {/* <audio src={fileSrc} ref={this.oAudio}/> */}
@@ -56,17 +56,18 @@ export default class Tool extends window.mix(
         onScroll={ev=>this.onScrollFn(ev)}
         style={{height: `${iCanvasHeight+20}px`}}
       >
-        <div className="length" style={{width: `${iCanvasWidth}px`}} />
+        <cpnt.TimeBar className="length" style={{width: `${iTimeBarWidth}px`}} >
+          <i className="pointer" ref={this.oPointer} />
+          {aTimeLine.map(({start, end},idx)=>{
+            return <cpnt.Region className={idx===iCurLine ? 'cur sentence' : 'sentence'} key={idx}
+              style={{left: `${start * oneScPx}px`, width: `${(end - start) * oneScPx}px`}}
+              onClick={()=>this.toPlay(idx)}
+            >
+              {idx+1}
+            </cpnt.Region>
+          })}
+        </cpnt.TimeBar>
         <canvas  height={iCanvasHeight} ref={this.oCanvas}/>
-        <i className="pointer" ref={this.oPointer} />
-        {aTimeLine.map(({start, end},idx)=>{
-          return <cpnt.Region className={idx===iCurLine ? 'cur sentence' : 'sentence'} key={idx}
-            style={{left: `${start * oneScPx}px`, width: `${(end - start) * oneScPx}px`}}
-            onClick={()=>this.toPlay(idx)}
-          >
-            {idx+1}
-          </cpnt.Region>
-        })}
       </cpnt.WaveWrap>
       <cpnt.BtnBar>
         <div>
@@ -112,19 +113,11 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount(){
-    const oWaveWrap = this.oWaveWrap.current;
     const buffer = await fn.getMp3();
-    const {sampleRate, length} = buffer;
-    const aWave = fn.getPeaks(buffer, this.state.perSecPx, 0, oWaveWrap.offsetWidth);
-    const sampleSize = ~~(sampleRate / this.state.perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
-    const iCanvasWidth = ~~(length / sampleSize); //遍历的次数（画布长度）
-    this.setState({
-      buffer,
-      aWave,
-      duration: buffer.duration,
-      oneScPx: aWave.length / 2 / buffer.duration,
-      iCanvasWidth,
-    });
+    const sText = await fn.getText();
+    const aTimeLine = fn.getTimeLine(sText).slice(0);
+    this.setState({buffer, aTimeLine});
+    this.bufferToPeaks();
     this.toDraw();
     this.watchKeyDown();
   }

@@ -24,7 +24,7 @@ export default class{
     oSententList.scrollTo(0, fHeight);
   }
   toDraw(){
-    const {aWave, iHeight} = this.state;
+    const {aPeaks, iHeight} = this.state;
     const oWaveWrap = this.oWaveWrap.current;
     const oCanvas = this.oCanvas.current;
     const Context = oCanvas.getContext('2d');
@@ -35,11 +35,11 @@ export default class{
     Context.fillStyle = 'black';
     Context.fillRect(0, 0, width, height);
     let idx = -1;
-    let fCanvasWidth = aWave.length / 2;
+    let fCanvasWidth = aPeaks.length / 2;
     while (idx < fCanvasWidth) {
       idx++;
-      const cur1 = aWave[idx * 2] * iHeight;
-      const cur2 = aWave[idx * 2 + 1] * iHeight;
+      const cur1 = aPeaks[idx * 2] * iHeight;
+      const cur2 = aPeaks[idx * 2 + 1] * iHeight;
       Context.fillStyle = '#55c655';
       Context.fillRect(
         idx, (halfHeight - cur1), 1, Math.ceil(cur1 - cur2),
@@ -125,4 +125,13 @@ export default class{
     this.toDraw();
     this.watchKeyDown();
   }
+  // ▼音频数据转换波峰数据
+  bufferToPeaks(){
+    const {offsetWidth} = this.oWaveWrap.current;
+    const {buffer, perSecPx} = this.state;
+    const obackData = fn.getPeaks(buffer, perSecPx, 0, offsetWidth );
+    // ▲返回内容：{aPeaks, oneScPx, duration, iTimeBarWidth};
+    this.setState({...obackData});
+  }
+  // 
 }

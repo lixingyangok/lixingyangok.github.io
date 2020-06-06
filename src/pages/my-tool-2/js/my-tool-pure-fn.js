@@ -17,36 +17,39 @@ export function secToStr(fSecond){
   return sTime;
 }
 
+// AudioBuffer.sampleRate  // 采样率：浮点数，单位为 sample/s
+// AudioBuffer.length  // 采样帧率：整形
+// AudioBuffer.duration  // 时长：双精度型（单位为秒）
+// AudioBuffer.numberOfChannels  // 通道数：整形
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
-  // AudioBuffer.sampleRate  // 采样率：浮点数，单位为 sample/s
-  // AudioBuffer.length  // 采样帧率：整形
-  // AudioBuffer.duration  // 时长：双精度型（单位为秒）
-  // AudioBuffer.numberOfChannels  // 通道数：整形
-  // console.log('buffer', buffer);
-  console.time("算波形");
-  const chan = buffer.getChannelData(0);
-  const {sampleRate} = buffer;
-  const sampleSize = ~~(sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
-  const peaks = [];
+  const oChannel = buffer.getChannelData(0);
+  const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
+  const iTimeBarWidth = ~~(buffer.length / sampleSize); // 时间轴长度
+  const aPeaks = [];
   let idx = left || 0;
-  while (idx <= iCanvasWidth) {
+  const last = idx + iCanvasWidth;
+  while (idx <= last) {
     let start = idx * sampleSize;
     const end = start + sampleSize;
     let min = 0;
     let max = 0;
     while (start < end) {
-      const value = chan[start];
+      const value = oChannel[start];
       if (value > max) max = value;
       else if (value < min) min = value;
       start++;
     }
-    peaks[2 * idx] = max; // 波峰
-    peaks[2 * idx + 1] = min; // 波谷
+    aPeaks[2 * idx] = max; // 波峰
+    aPeaks[2 * idx + 1] = min; // 波谷
     idx++;
   }
-  console.timeEnd("算波形");
-  return peaks.slice((left||0)*2);
+  return {
+    iTimeBarWidth,
+    oneScPx: iTimeBarWidth / buffer.duration,
+    aPeaks: aPeaks.slice(left*2),
+    duration: buffer.duration,
+  };
 }
 export async function getMp3() {
   const res = await fetch('./static/Im Lost.mp3');
