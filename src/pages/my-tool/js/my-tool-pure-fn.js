@@ -14,7 +14,7 @@ export function secToStr(fSecond){
   let fSec = fSecond - (iHour*3600 + iMinut*60) + ''; //秒
   let [sec01, sec02='000'] = fSec.split('.');
   const sTime = `${iHour.padStart(2, 0)}:${iMinut.padStart(2, 0)}:${sec01.padStart(2, 0)},${sec02.slice(0, 3).padEnd(3,0)}`;
-  return sTime
+  return sTime;
 }
 
 // ▼计算波峰、波谷
@@ -52,6 +52,7 @@ export function getPeaks(buffer, perSecPx) {
 
 export async function getMp3() {
   const res = await fetch('./static/Im Lost.mp3');
+  console.log('音频返回', res);
   const arrayBuffer = await res.arrayBuffer();
   let audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const buffer = await audioContext.decodeAudioData(arrayBuffer);

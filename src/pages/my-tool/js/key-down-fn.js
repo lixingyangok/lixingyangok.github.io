@@ -25,9 +25,9 @@ export default class{
       const shift = shiftKey ? 'shift + ' : '';
       const alt = altKey ? 'alt + ' : '';
       const key = ctrl + shift + alt + keyCode;
-      console.log('按下：', keyCode);
       const theFn = fnLib[key];
       if (!theFn) return;
+      console.log('按下：', keyCode);
       theFn.bind(this)();
       ev.preventDefault();
       ev.stopPropagation();
@@ -97,22 +97,27 @@ export default class{
     this.setState({aTimeLine});
   }
   onWheelFn(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.returnValue=false;
     const {altKey, ctrlKey, shiftKey, nativeEvent:{deltaY}} = ev;
     if (0) console.log(ctrlKey, shiftKey);
     if (altKey){
       this.zoomWave(deltaY);
-    }else if(altKey && shiftKey){
-      this.scrollToFn(deltaY);
-    }else{
+    }else if(ctrlKey){
       this.changeWaveHeigh(deltaY);
+    }else{
+      this.scrollToFn(deltaY);
     }
+    return false;
   }
   scrollToFn(deltaY){
     const oDom = this.oBox.current;
+    const iLong = 300;
     const newVal = (()=>{
       let oldVal = oDom.scrollLeft;
-      if (deltaY <= 0) return oldVal - 55;
-      else return oldVal + 55;
+      if (deltaY <= 0) return oldVal - iLong;
+      else return oldVal + iLong;
     })();
     oDom.scrollTo(newVal, 0);
   }
@@ -142,7 +147,7 @@ export default class{
   changeWaveHeigh(deltaY){
     let {iHeight} = this.state;
     const min = 10;
-    const max = 400;
+    const max = 350;
     const iStep = 20;
     if (deltaY <= 0) iHeight += iStep;
     else iHeight -= iStep;
