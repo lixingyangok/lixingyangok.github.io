@@ -17,7 +17,7 @@ export const WaveWrap = styled.div`
   position: relative;
   flex: none;
   canvas{}
-  .sentence{
+  .region{
     box-sizing: border-box;
     position: absolute;
     top: 0px;
@@ -30,11 +30,11 @@ export const WaveWrap = styled.div`
     border: solid rgba(255,255,255,0.5);
     border-width: 0 1px;
     overflow: hidden;
-    &[class~=cur]{
-      border-color: transparent blue transparent red;
-      border-width: 0 2px;
-      background: rgba(0,0,0,0);
-    }
+  }
+  .cur{
+    border-color: transparent blue transparent red;
+    border-width: 0 2px;
+    background: rgba(0,0,0,0);
   }
   .pointer{
     position: absolute;
@@ -57,15 +57,14 @@ export const TimeBar = styled.div`
   position: relative;
   height: 100%;
   background: rgba(0,0,0,0.1);
+  .second-mark{
+    border-left: solid 1px white;
+    height: 15px;
+    z-index: 3;
+    position: relative;
+    display: inline-block;
+  }
 `;
-
-export const BtnBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 15px 0;
-  
-`;
-
 
 export const Region = styled.span`
   display: inline-block;
@@ -73,6 +72,15 @@ export const Region = styled.span`
   margin: 5px 10px 0 0;
   padding: 3px 10px;
   border-radius: 3px;
+  color: white;
+`;
+
+
+
+export const BtnBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
 `;
 
 export const InputWrap = styled.div`
@@ -92,7 +100,7 @@ export const InputWrap = styled.div`
 export const SentenceWrap = styled.ol`
   overflow-y: auto;
   list-style: none;
-  padding: 0;
+  padding: 0 0 100px;
   margin: 0;
   border-bottom: solid 1px #aaa;
   .one-line{

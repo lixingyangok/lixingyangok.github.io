@@ -27,7 +27,6 @@ export const MyBox = styled.div`
   overflow-y: hidden;
   position: relative;
   canvas{
-    /* height: 200px; */
     outline: solid 1px blue;
   }
   .sentence{
@@ -57,7 +56,6 @@ export const MyBox = styled.div`
     top: 0;
     left: 100px;
     z-index: 9;
-    /* transition-timing-function: linear !important; */
   }
 `;
 

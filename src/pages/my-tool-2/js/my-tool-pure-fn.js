@@ -1,4 +1,5 @@
 
+export const fileName = '伊索寓言';
 
 // ▼时间轴的时间转秒
 export function getSeconds(text) {
@@ -24,14 +25,14 @@ export function secToStr(fSecond){
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
   const oChannel = buffer.getChannelData(0);
-  const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
-  const iTimeBarWidth = ~~(buffer.length / sampleSize); // 时间轴长度
+  const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
+  const iTimeBarWidth = buffer.length / ~~sampleSize; // 时间轴长度
   const aPeaks = [];
   let idx = left || 0;
   const last = idx + iCanvasWidth;
   while (idx <= last) {
-    let start = idx * sampleSize;
-    const end = start + sampleSize;
+    let start = idx * ~~sampleSize;
+    const end = start + ~~sampleSize;
     let min = 0;
     let max = 0;
     while (start < end) {
@@ -46,13 +47,13 @@ export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
   }
   return {
     iTimeBarWidth,
-    oneScPx: iTimeBarWidth / buffer.duration,
+    oneScPx: (iTimeBarWidth / buffer.duration),
     aPeaks: aPeaks.slice(left*2),
     duration: buffer.duration,
   };
 }
 export async function getMp3() {
-  const res = await fetch('./static/Im Lost.mp3');
+  const res = await fetch(`./static/${fileName}.mp3`);
   // console.log('音频返回', res);
   const arrayBuffer = await res.arrayBuffer();
   let audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -62,7 +63,7 @@ export async function getMp3() {
 };
 
 export async function getText() {
-  let res = await fetch('./static/Im Lost.srt', {
+  let res = await fetch(`./static/${fileName}.srt`, {
     method: "get",
     headers: {"Content-Type": "application/json"},
     credentials: "same-origin",
