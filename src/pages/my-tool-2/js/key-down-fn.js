@@ -113,16 +113,17 @@ export default class {
   }
   // ▼使其横向缩放
   zoomWave(deltaY, ev) {
-    console.log(ev);
-    const { perSecPx: perSecPxOld} = this.state;
+    const {perSecPx: perSecPxOld} = this.state;
     let perSecPx = (() => {
       let iDirection = 10 * (deltaY <= 0 ? -1 : 1);
       let result = perSecPxOld + iDirection;
-      if (result < 10) result = 10; //每秒小px
-      else if (result > 300) result = 300; //每秒最大px
+      const [min, max] = [20, 200]; //每秒最小，最大px
+      if (result < min) result = min;
+      else if (result > max) result = max;
       return result;
     })();
-    const aPeaks = this.bufferToPeaks(perSecPx);
+    console.log('距离左边', ev.offsetX);
+    const aPeaks = this.bufferToPeaks(perSecPx, ev.offsetX);
     this.setState({aPeaks, perSecPx});
     this.toDraw(aPeaks);
   }
@@ -146,8 +147,8 @@ export default class {
     oCanvas.style.left = left + 'px';
     const { buffer, perSecPx } = this.state;
     const { offsetWidth } = this.oWaveWrap.current;
-    const { aPeaks } = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
-    this.setState({ aPeaks });
+    const {aPeaks, iTimeBarWidth} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
+    this.setState({ aPeaks, iTimeBarWidth });
     this.toDraw(aPeaks);
   }
   // ▼在波形上滚动
@@ -165,6 +166,7 @@ export default class {
     ev.stopPropagation();
     ev.returnValue = false;
   }
+  // ▼控制***
   wheelOnSpan(ev) {
     const { altKey, ctrlKey, shiftKey, nativeEvent: { deltaY } } = ev;
     if (0) console.log(ctrlKey, shiftKey, altKey);

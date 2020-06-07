@@ -127,9 +127,13 @@ export default class {
     this.watchKeyDown();
   }
   // ▼音频数据转换波峰数据
-  bufferToPeaks(perSecPx_) {
-    const { offsetWidth, scrollLeft } = this.oWaveWrap.current;
+  bufferToPeaks(perSecPx_, leftPoint=0) {
+    const oWaveWrap = this.oWaveWrap.current;
+    const { offsetWidth, scrollLeft } = oWaveWrap;
     const { buffer, perSecPx } = this.state;
+    console.log('缩放：', (perSecPx_ - perSecPx) * leftPoint);
+    // oWaveWrap.scrollTo(scrollLeft + (perSecPx_ - perSecPx) * leftPoint , 0);
+    // oWaveWrap.off
     const obackData = fn.getPeaks(
       buffer, (perSecPx_ || perSecPx), scrollLeft, offsetWidth,
     );
@@ -137,5 +141,10 @@ export default class {
     this.setState({ ...obackData });
     return obackData.aPeaks;
   }
-  // 
+  //
+  mouseMoveOnWave(ev){
+    const oWaveWrap = this.oWaveWrap.current;
+    const iFromLeft = ev.clientX - oWaveWrap.offsetLeft;
+    console.log(iFromLeft);
+  }
 }

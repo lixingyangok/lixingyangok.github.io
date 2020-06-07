@@ -60,15 +60,18 @@ export default class Tool extends window.mix(
           ref={this.oWaveWrap}
           onScroll={(ev) => this.onScrollFn(ev)}
           style={{ height: `${iCanvasHeight + 20}px` }}
-        >
-          <cpnt.TimeBar className="length123"
+          // onMouseMove={(ev) => this.mouseMoveOnWave(ev)}
+          >
+          <cpnt.TimeBar
+            className="length123"
             style={{ width: `${iTimeBarWidth}px` }}
           >
             <i className="pointer" ref={this.oPointer} />
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
                 return (
-                  <cpnt.Region key={idx}
+                  <cpnt.Region
+                    key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
                     style={{
                       left: `${start * oneScPx}px`,
@@ -82,12 +85,16 @@ export default class Tool extends window.mix(
               })}
             </section>
             <section>
-              {[...Array(~~duration).keys()].map(cur=>{
-                return <span className="second-mark" key={cur}
-                  style={{width: oneScPx+'px'}}
-                >
-                  {cur}
-                </span>
+              {[...Array(~~duration).keys()].map((cur) => {
+                return (
+                  <span
+                    className="second-mark"
+                    key={cur}
+                    style={{ width: oneScPx + "px" }}
+                  >
+                    {cur}
+                  </span>
+                );
               })}
             </section>
           </cpnt.TimeBar>
@@ -161,11 +168,9 @@ export default class Tool extends window.mix(
     this.bufferToPeaks();
     this.toDraw();
     this.watchKeyDown(); //注册
-    oWaveWrap.addEventListener(
-      "mousewheel",
-      ev=>this.wheelOnWave(ev),
-      {passive: false},
-    );
+    oWaveWrap.addEventListener("mousewheel", (ev) => this.wheelOnWave(ev), {
+      passive: false,
+    });
   }
   //
 }
