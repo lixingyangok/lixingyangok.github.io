@@ -59,7 +59,7 @@ export async function getMp3() {
   let audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const buffer = await audioContext.decodeAudioData(arrayBuffer);
   audioContext = null; // 如果不销毁audioContext对象的话，audio标签是无法播放的
-  return buffer; //getPeaks(buffer, 100); // 每秒44100个点分成100份
+  return buffer; 
 };
 
 export async function getText() {

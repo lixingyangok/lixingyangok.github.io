@@ -116,9 +116,10 @@ export default class {
     console.log(ev);
     const { perSecPx: perSecPxOld} = this.state;
     let perSecPx = (() => {
-      let iDirection = 130 * deltaY <= 0 ? -1 : 1;
+      let iDirection = 10 * (deltaY <= 0 ? -1 : 1);
       let result = perSecPxOld + iDirection;
-      if (result < 3) result = 3;
+      if (result < 10) result = 10; //每秒小px
+      else if (result > 300) result = 300; //每秒最大px
       return result;
     })();
     const aPeaks = this.bufferToPeaks(perSecPx);
