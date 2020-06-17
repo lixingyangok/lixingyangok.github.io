@@ -141,10 +141,4 @@ export default class {
     this.setState({ ...obackData });
     return obackData.aPeaks;
   }
-  //
-  mouseMoveOnWave(ev){
-    const oWaveWrap = this.oWaveWrap.current;
-    const iFromLeft = ev.clientX - oWaveWrap.offsetLeft;
-    console.log(iFromLeft);
-  }
 }

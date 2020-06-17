@@ -30,7 +30,7 @@ export default class {
       const alt = altKey ? 'alt + ' : '';
       const key = ctrl + shift + alt + keyCode;
       const theFn = fnLib[key];
-      console.log('按下：', keyCode);
+      // console.log('按下：', keyCode);
       if (!theFn) return;
       theFn.bind(this)();
       ev.preventDefault();
@@ -59,7 +59,7 @@ export default class {
         aTimeLine: [...aTimeLine, oNewItem],
       });
     };
-    this.setState({ iCurLine: iCurLineNew });
+    this.setState({iCurLine: iCurLineNew});
     this.goLine(iCurLineNew);
   }
   // ▼按钮回车键
@@ -122,10 +122,32 @@ export default class {
       else if (result > max) result = max;
       return result;
     })();
-    console.log('距离左边', ev.offsetX);
+    // console.log('距离左边', ev.offsetX);
     const aPeaks = this.bufferToPeaks(perSecPx, ev.offsetX);
     this.setState({aPeaks, perSecPx});
     this.toDraw(aPeaks);
+  }
+  // ▼横向缩放。接收一个事件对象
+  zoomWave02(ev){
+    const oWaveWrap = this.oWaveWrap.current;
+    const {offsetLeft, scrollLeft} = oWaveWrap;
+    const {clientX, deltaY} = ev;
+    const {perSecPx: perSecPxOld} = this.state;
+    const iLeftPx = clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
+    const iNowSec = iLeftPx / perSecPxOld; //当前指向时间（秒）
+    const perSecPx = (() => {
+      const iDirection = 10 * (deltaY <= 0 ? 1 : -1);
+      let result = perSecPxOld + iDirection;
+      const [min, max] = [20, 200]; //每秒最小/最大px
+      if (result < min) result = min;
+      else if (result > max) result = max;
+      return result;
+    })();
+    const iNewLeftPx = (iNowSec * perSecPx) - (clientX - offsetLeft);
+    this.setState({
+      perSecPx,
+    });
+    oWaveWrap.scrollTo(iNewLeftPx, 0);
   }
   // 改变波形高度
   changeWaveHeigh(deltaY) {
@@ -152,11 +174,14 @@ export default class {
     this.toDraw(aPeaks);
   }
   // ▼在波形上滚动
-  wheelOnWave(ev) {
-    const { altKey, ctrlKey, shiftKey, wheelDeltaY, deltaY } = ev; 
+  wheelOnWave(ev){
+    const {altKey, ctrlKey, shiftKey, wheelDeltaY, deltaY} = ev; 
     if (0) console.log(shiftKey, deltaY);
     if (ctrlKey) {
-      this.zoomWave(wheelDeltaY, ev);
+      // console.log(ev.layerX);
+      // this.zoomWave(wheelDeltaY, ev);
+      this.zoomWave02(ev);
+      // layerX
     } else if (altKey) {
       this.changeWaveHeigh(wheelDeltaY);
     } else {
@@ -169,14 +194,7 @@ export default class {
   // ▼控制***
   wheelOnSpan(ev) {
     const { altKey, ctrlKey, shiftKey, nativeEvent: { deltaY } } = ev;
-    if (0) console.log(ctrlKey, shiftKey, altKey);
-    if (altKey) {
-      this.zoomWave(deltaY);
-    } else if (ctrlKey) {
-      // this.changeWaveHeigh(deltaY);
-    } else {
-      this.scrollToFn(deltaY);
-    }
+    if (0) console.log(ctrlKey, shiftKey, altKey, deltaY);
   }
 }
 

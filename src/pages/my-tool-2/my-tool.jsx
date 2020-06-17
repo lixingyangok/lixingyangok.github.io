@@ -3,7 +3,7 @@ import * as cpnt from "./style/my-tool-style.js";
 import theFn from "./js/my-tool.js";
 import keyDownFn from "./js/key-down-fn.js";
 import * as fn from "./js/my-tool-pure-fn.js";
-import { Button } from "antd";
+import {Button} from "antd";
 
 export default class Tool extends window.mix(
   React.Component,
@@ -40,43 +40,33 @@ export default class Tool extends window.mix(
       perSecPx: 30,
       iHeight: 50,
       iTimeBarWidth: 0, //画布总宽
-      iCanvasHeight: 160,
+      iCanvasHeight: 150,
     };
   }
   render() {
     const {
-      oneScPx,
       aTimeLine,
       iCurLine,
-      iTimeBarWidth,
       iCanvasHeight,
       duration,
+      perSecPx,
     } = this.state;
     return (
       <cpnt.Div>
         {/* <audio src={fileSrc} ref={this.oAudio}/> */}
         <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} />
-        <cpnt.WaveWrap
-          ref={this.oWaveWrap}
+        <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={(ev) => this.onScrollFn(ev)}
-          style={{ height: `${iCanvasHeight + 20}px` }}
-          // onMouseMove={(ev) => this.mouseMoveOnWave(ev)}
-          >
-          <cpnt.TimeBar
-            className="length123"
-            style={{ width: `${iTimeBarWidth}px` }}
-          >
+          style={{ height: `${iCanvasHeight + 20}px`}}
+        >
+          <cpnt.TimeBar style={{ width: `${perSecPx * duration}px` }} >
             <i className="pointer" ref={this.oPointer} />
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
                 return (
-                  <cpnt.Region
-                    key={idx}
+                  <cpnt.Region key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
-                    style={{
-                      left: `${start * oneScPx}px`,
-                      width: `${(end - start) * oneScPx}px`,
-                    }}
+                    style={{left: `${start * perSecPx}px`, width: `${(end - start) * perSecPx}px`}}
                     onClick={() => this.toPlay(idx)}
                   >
                     {idx + 1}
@@ -87,10 +77,8 @@ export default class Tool extends window.mix(
             <section>
               {[...Array(~~duration).keys()].map((cur) => {
                 return (
-                  <span
-                    className="second-mark"
-                    key={cur}
-                    style={{ width: oneScPx + "px" }}
+                  <span className="second-mark" key={cur}
+                    style={{ width: perSecPx + "px" }}
                   >
                     {cur}
                   </span>
@@ -124,9 +112,8 @@ export default class Tool extends window.mix(
           {(() => {
             if (!aTimeLine[iCurLine]) return <span />;
             return (
-              <textarea
+              <textarea value={(aTimeLine[iCurLine] || {}).text}
                 onChange={(ev) => this.valChanged(ev)}
-                value={(aTimeLine[iCurLine] || {}).text}
                 onKeyDown={(ev) => this.enterKeyDown(ev)}
               />
             );
@@ -136,13 +123,10 @@ export default class Tool extends window.mix(
         <cpnt.SentenceWrap ref={this.oSententList}>
           {aTimeLine.map((cur, idx) => {
             return (
-              <li
-                key={idx}
-                onClick={() => this.toPlay(idx)}
-                className={`one-line ${idx === iCurLine ? "cur" : ""}`}
+              <li className={`one-line ${idx === iCurLine ? "cur" : ""}`}
+                key={idx} onClick={() => this.toPlay(idx)}
               >
-                <i
-                  className="idx"
+                <i className="idx"
                   style={{ width: `${String(aTimeLine.length || 0).length}em` }}
                 >
                   {idx + 1}
@@ -168,9 +152,10 @@ export default class Tool extends window.mix(
     this.bufferToPeaks();
     this.toDraw();
     this.watchKeyDown(); //注册
-    oWaveWrap.addEventListener("mousewheel", (ev) => this.wheelOnWave(ev), {
-      passive: false,
-    });
+    oWaveWrap.addEventListener(
+      "mousewheel",
+      (ev) => this.wheelOnWave(ev),
+      {passive: false},
+    );
   }
-  //
 }
