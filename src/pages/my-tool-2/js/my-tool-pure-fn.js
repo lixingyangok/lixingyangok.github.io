@@ -1,3 +1,8 @@
+/*
+ * @Author: 李星阳
+ * @LastEditors: 李星阳
+ * @Description: 
+ */ 
 
 export const fileName = '伊索寓言';
 
@@ -25,14 +30,14 @@ export function secToStr(fSecond){
 // ▼计算波峰、波谷
 export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
   const oChannel = buffer.getChannelData(0);
-  const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
-  const iTimeBarWidth = buffer.length / ~~sampleSize; // 时间轴长度
+  // const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
+  const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
   const aPeaks = [];
   let idx = left || 0;
   const last = idx + iCanvasWidth;
   while (idx <= last) {
-    let start = idx * ~~sampleSize;
-    const end = start + ~~sampleSize;
+    let start = idx * sampleSize;
+    const end = start + sampleSize;
     let min = 0;
     let max = 0;
     while (start < end) {
@@ -46,8 +51,7 @@ export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
     idx++;
   }
   return {
-    iTimeBarWidth,
-    oneScPx: (iTimeBarWidth / buffer.duration),
+    oneScPx: buffer.length / sampleSize / buffer.duration,
     aPeaks: aPeaks.slice(left*2),
     duration: buffer.duration,
   };

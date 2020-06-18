@@ -111,24 +111,9 @@ export default class {
     })();
     oDom.scrollTo(newVal, 0);
   }
-  // ▼使其横向缩放
-  zoomWave(deltaY, ev) {
-    const {perSecPx: perSecPxOld} = this.state;
-    let perSecPx = (() => {
-      let iDirection = 10 * (deltaY <= 0 ? -1 : 1);
-      let result = perSecPxOld + iDirection;
-      const [min, max] = [20, 200]; //每秒最小，最大px
-      if (result < min) result = min;
-      else if (result > max) result = max;
-      return result;
-    })();
-    // console.log('距离左边', ev.offsetX);
-    const aPeaks = this.bufferToPeaks(perSecPx, ev.offsetX);
-    this.setState({aPeaks, perSecPx});
-    this.toDraw(aPeaks);
-  }
   // ▼横向缩放。接收一个事件对象
-  zoomWave02(ev){
+  zoomWave(ev){
+    console.time('zoomWave');
     const oWaveWrap = this.oWaveWrap.current;
     const {offsetLeft, scrollLeft} = oWaveWrap;
     const {clientX, deltaY} = ev;
@@ -144,10 +129,9 @@ export default class {
       return result;
     })();
     const iNewLeftPx = (iNowSec * perSecPx) - (clientX - offsetLeft);
-    this.setState({
-      perSecPx,
-    });
     oWaveWrap.scrollTo(iNewLeftPx, 0);
+    console.timeEnd('zoomWave');
+    this.setState({perSecPx});
   }
   // 改变波形高度
   changeWaveHeigh(deltaY) {
@@ -164,13 +148,14 @@ export default class {
   }
   // 监听滚动
   onScrollFn(ev) {
+    console.log('滚动了');
     const oCanvas = this.oCanvas.current;
     const left = ev.target.scrollLeft;
     oCanvas.style.left = left + 'px';
-    const { buffer, perSecPx } = this.state;
-    const { offsetWidth } = this.oWaveWrap.current;
-    const {aPeaks, iTimeBarWidth} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
-    this.setState({ aPeaks, iTimeBarWidth });
+    const {buffer, perSecPx} = this.state;
+    const {offsetWidth} = this.oWaveWrap.current;
+    const {aPeaks} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
+    this.setState({aPeaks});
     this.toDraw(aPeaks);
   }
   // ▼在波形上滚动
@@ -178,10 +163,7 @@ export default class {
     const {altKey, ctrlKey, shiftKey, wheelDeltaY, deltaY} = ev; 
     if (0) console.log(shiftKey, deltaY);
     if (ctrlKey) {
-      // console.log(ev.layerX);
-      // this.zoomWave(wheelDeltaY, ev);
-      this.zoomWave02(ev);
-      // layerX
+      this.zoomWave(ev);
     } else if (altKey) {
       this.changeWaveHeigh(wheelDeltaY);
     } else {

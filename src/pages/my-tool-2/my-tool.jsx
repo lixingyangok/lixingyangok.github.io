@@ -29,7 +29,6 @@ export default class Tool extends window.mix(
       buffer: {}, //音频数据
       aPeaks: [], //波形数据
       duration: 0, //音频长度（秒
-      oneScPx: 0, //一秒种的
       timer: null, //定时器1
       timer02: null, //定时器2
       iCurLine: 1, //当前行
@@ -37,36 +36,39 @@ export default class Tool extends window.mix(
       aTimeLine: [oFirstLine], //字幕
       fileName: "", //文件名
       fileSrc: "", //文件地址
-      perSecPx: 30,
       iHeight: 50,
-      iTimeBarWidth: 0, //画布总宽
       iCanvasHeight: 150,
+      perSecPx: 135, //人为定义的每秒像素数
     };
   }
   render() {
     const {
+      buffer,
       aTimeLine,
       iCurLine,
       iCanvasHeight,
       duration,
       perSecPx,
     } = this.state;
+    // const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
+    const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
+    const oneScPx = buffer.length / sampleSize / duration;
     return (
       <cpnt.Div>
         {/* <audio src={fileSrc} ref={this.oAudio}/> */}
         <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} />
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={(ev) => this.onScrollFn(ev)}
-          style={{ height: `${iCanvasHeight + 20}px`}}
+          style={{height: `${iCanvasHeight + 20}px`}}
         >
-          <cpnt.TimeBar style={{ width: `${perSecPx * duration}px` }} >
+          <cpnt.TimeBar style={{ width: `${oneScPx * duration}px` }} >
             <i className="pointer" ref={this.oPointer} />
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
                 return (
                   <cpnt.Region key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
-                    style={{left: `${start * perSecPx}px`, width: `${(end - start) * perSecPx}px`}}
+                    style={{left: `${start * oneScPx}px`, width: `${(end - start) * oneScPx}px`}}
                     onClick={() => this.toPlay(idx)}
                   >
                     {idx + 1}
@@ -74,11 +76,12 @@ export default class Tool extends window.mix(
                 );
               })}
             </section>
+            {/* ▼刻度（秒）*/}
             <section>
-              {[...Array(~~duration).keys()].map((cur) => {
+              {[...Array(~~duration).keys()].map((cur, idx) => {
                 return (
                   <span className="second-mark" key={cur}
-                    style={{ width: perSecPx + "px" }}
+                    style={{ width: oneScPx + "px", left: idx*oneScPx + "px" }}
                   >
                     {cur}
                   </span>

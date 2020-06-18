@@ -11,9 +11,9 @@ export default class {
   async goLine(idx) {
     await new Promise(resolve => resolve(), 100);
     const oWaveWrap = this.oWaveWrap.current;
-    const { oneScPx, aTimeLine } = this.state;
+    const { perSecPx, aTimeLine } = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx - 1];
-    const leftVal = oneScPx * oAim.start - 500;
+    const leftVal = perSecPx * oAim.start - 500;
     oWaveWrap.scrollTo(leftVal, 0);
     // 分界
     const oSententList = this.oSententList.current;
@@ -137,7 +137,7 @@ export default class {
     const obackData = fn.getPeaks(
       buffer, (perSecPx_ || perSecPx), scrollLeft, offsetWidth,
     );
-    // ▲返回内容：{aPeaks, oneScPx, duration, iTimeBarWidth};
+    // ▲返回内容：{aPeaks, oneScPx, duration};
     this.setState({ ...obackData });
     return obackData.aPeaks;
   }
