@@ -113,36 +113,36 @@ export default class {
   }
   // ▼横向缩放。接收一个事件对象
   zoomWave(ev){
-    if (this.state.drawing) return;
-    const {perSecPx: perSecPxOld, fPerSecPx, buffer} = this.state;
+    if (this.state.drawing) return; //防抖
+    const {iPerSecPx: perSecPxOld, fPerSecPx, buffer} = this.state;
     const {clientX, deltaY} = ev;
-    const [min, max] = [30, 200]; //每秒最小/最大px
+    const [min, max] = [30, 250]; //每秒最小/最大px
     if ((perSecPxOld<=min && deltaY>=0) || (perSecPxOld>=max && deltaY<=0)){
-      console.log('进来了');
-      this.setState({drawing: false});
-      return;
+      return this.setState({drawing: false});
     }
-    this.setState({drawing: true});
     const oWaveWrap = this.oWaveWrap.current;
     const {offsetLeft, scrollLeft} = oWaveWrap;
     const iLeftPx = clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
     const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
-    console.log(`${~~(iNowSec/60)}分 ${iNowSec%60}秒`);
-    const perSecPx = (() => {
-      const iDirection = 30 * (deltaY <= 0 ? 1 : -1);
+    const iPerSecPx = (() => {
+      const iDirection = 50 * (deltaY <= 0 ? 1 : -1);
       let result = perSecPxOld + iDirection;
       if (result < min) result = min;
       else if (result > max) result = max;
       return result;
     })();
-    const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
-    const oneScPx = buffer.length / sampleSize / buffer.duration;
-    const iNewLeftPx = (iNowSec * oneScPx) - (clientX - offsetLeft);
-    this.setState({perSecPx});
+    const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
+    const fPerSecPx_ = buffer.length / sampleSize / buffer.duration;
+    const iNewLeftPx = (iNowSec * fPerSecPx_) - (clientX - offsetLeft);
+    this.setState({iPerSecPx, fPerSecPx_, drawing: true});
     oWaveWrap.scrollTo(iNewLeftPx, 0);
-    console.log('前往', iNewLeftPx);
-    console.log('到达', oWaveWrap.scrollLeft);
+    this.oPointer.current.style.left = (()=>{
+      const {currentTime} = this.oAudio.current;
+      return `${currentTime * fPerSecPx_}px`;
+    })();
+    if (iNewLeftPx<=0) this.onScrollFn();
   }
+
   // 改变波形高度
   changeWaveHeigh(deltaY) {
     let { iHeight } = this.state;
@@ -157,13 +157,13 @@ export default class {
     this.toDraw();
   }
   // 监听滚动
-  onScrollFn(ev) {
-    const oCanvas = this.oCanvas.current;
-    const left = ev.target.scrollLeft;
-    oCanvas.style.left = left + 'px';
-    const {buffer, perSecPx} = this.state;
-    const {offsetWidth} = this.oWaveWrap.current;
-    const {aPeaks, fPerSecPx} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
+  onScrollFn() {
+    let {buffer, iPerSecPx} = this.state;
+    let {offsetWidth, scrollLeft} = this.oWaveWrap.current;
+    const {aPeaks, fPerSecPx} = fn.getPeaks(
+      buffer, iPerSecPx, scrollLeft, offsetWidth,
+    );
+    this.oCanvas.current.style.left = scrollLeft + 'px';
     this.setState({aPeaks, fPerSecPx});
     this.toDraw(aPeaks);
   }

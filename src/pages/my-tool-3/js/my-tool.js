@@ -11,9 +11,9 @@ export default class {
   async goLine(idx) {
     await new Promise(resolve => resolve(), 100);
     const oWaveWrap = this.oWaveWrap.current;
-    const { perSecPx, aTimeLine } = this.state;
+    const { iPerSecPx, aTimeLine } = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx - 1];
-    const leftVal = perSecPx * oAim.start - 500;
+    const leftVal = iPerSecPx * oAim.start - 500;
     oWaveWrap.scrollTo(leftVal, 0);
     // 分界
     const oSententList = this.oSententList.current;
@@ -52,28 +52,30 @@ export default class {
     return oCanvas;
   }
   async toPlay(iCurLine) {
-    const { state, oAudio, oPointer: { current: oPointer } } = this;
-    const { aTimeLine, oneScPx } = this.state;
+    const {state} = this;
+    const {aTimeLine, fPerSecPx} = this.state;
     clearTimeout(state.timer);
     clearInterval(state.timer02);
     iCurLine = typeof iCurLine == 'number' ? iCurLine : state.iCurLine;
     const { long, end, start } = aTimeLine[iCurLine];
-    const iDestination = end * oneScPx;
-    const Audio = oAudio.current;
-    oPointer.style.left = `${start * oneScPx}px`;
+    const Audio = this.oAudio.current;
+    const {style} = this.oPointer.current;
+    style.left = `${start * fPerSecPx}px`;
     Audio.currentTime = start;
     Audio.play();
-    let timer = setTimeout(() => {
-      Audio.pause();
-    }, long * 1000);
+    let timer = setTimeout(
+      ()=>Audio.pause(), long * 1000,
+    );
     let timer02 = setInterval(() => {
-      const newLeft = oPointer.offsetLeft + 1;
-      if (newLeft >= iDestination) {
-        return clearInterval(state.timer02);
+      const fPerSecPx = this.state.fPerSecPx;
+      const step = long * fPerSecPx / (long * 100);
+      const newLeft = Number.parseFloat(style.left) + step;
+      if (newLeft >= end * fPerSecPx) {
+        return clearInterval(this.state.timer02);
       }
-      oPointer.style.left = `${newLeft}px`;
-    }, 1000 / oneScPx);
-    this.setState({ timer, timer02, iCurLine });
+      style.left = `${newLeft}px`;
+    }, 10);
+    this.setState({timer, timer02, iCurLine});
     this.goLine(iCurLine);
   }
   toExport() {
@@ -122,7 +124,7 @@ export default class {
       aWave,
       fCanvasWidth,
       duration: buffer.duration,
-      oneScPx: fCanvasWidth / buffer.duration,
+      fPerSecPx: fCanvasWidth / buffer.duration,
     });
     this.toDraw();
     this.watchKeyDown();
@@ -131,14 +133,11 @@ export default class {
   bufferToPeaks(perSecPx_, leftPoint=0) {
     const oWaveWrap = this.oWaveWrap.current;
     const { offsetWidth, scrollLeft } = oWaveWrap;
-    const { buffer, perSecPx } = this.state;
-    console.log('缩放：', (perSecPx_ - perSecPx) * leftPoint);
-    // oWaveWrap.scrollTo(scrollLeft + (perSecPx_ - perSecPx) * leftPoint , 0);
-    // oWaveWrap.off
+    const { buffer, iPerSecPx } = this.state;
     const obackData = fn.getPeaks(
-      buffer, (perSecPx_ || perSecPx), scrollLeft, offsetWidth,
+      buffer, (perSecPx_ || iPerSecPx), scrollLeft, offsetWidth,
     );
-    // ▲返回内容：{aPeaks, oneScPx, duration};
+    // ▲返回内容：{aPeaks, fPerSecPx, duration};
     this.setState({ ...obackData });
     return obackData.aPeaks;
   }

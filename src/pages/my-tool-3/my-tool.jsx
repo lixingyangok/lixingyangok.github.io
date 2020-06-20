@@ -38,7 +38,7 @@ export default class Tool extends window.mix(
       fileSrc: "", //文件地址
       iHeight: 50,
       iCanvasHeight: 150,
-      perSecPx: 135, //人为定义的每秒像素数
+      iPerSecPx: 55, //人为定义的每秒像素数
       fPerSecPx: 0,
       drawing: false,
     };
@@ -50,27 +50,27 @@ export default class Tool extends window.mix(
       iCurLine,
       iCanvasHeight,
       duration,
-      perSecPx,
+      iPerSecPx,
+      // fPerSecPx,
     } = this.state;
-    // const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
-    const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
-    const oneScPx = buffer.length / sampleSize / duration;
+    const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
+    const fPerSecPx = buffer.length / sampleSize / duration;
     return (
       <cpnt.Div>
         {/* <audio src={fileSrc} ref={this.oAudio}/> */}
         <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} />
         <cpnt.WaveWrap ref={this.oWaveWrap}
-          onScroll={(ev) => this.onScrollFn(ev)}
+          onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
         >
-          <cpnt.TimeBar style={{ width: `${oneScPx * duration}px` }} >
+          <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} >
             <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
                 return (
                   <cpnt.Region key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
-                    style={{left: `${start * oneScPx}px`, width: `${(end - start) * oneScPx}px`}}
+                    style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
                     onClick={() => this.toPlay(idx)}
                   >
                     {idx + 1}
@@ -83,7 +83,7 @@ export default class Tool extends window.mix(
               {[...Array(~~duration).keys()].map((cur, idx) => {
                 return (
                   <span className="second-mark" key={cur}
-                    style={{ width: oneScPx + "px", left: idx*oneScPx + "px" }}
+                    style={{ width: fPerSecPx + "px", left: idx*fPerSecPx + "px" }}
                   >
                     {cur}
                   </span>
@@ -149,18 +149,17 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
-    const oWaveWrap = this.oWaveWrap.current;
+    this.watchKeyDown(); 
+    this.oWaveWrap.current.addEventListener(
+      "mousewheel", ev => this.wheelOnWave(ev),
+      {passive: false},
+    );
+    // ▼加载
     const buffer = await fn.getMp3();
     const sText = await fn.getText();
-    const aTimeLine = fn.getTimeLine(sText).slice(0);
+    const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
     this.setState({ buffer, aTimeLine });
     this.bufferToPeaks();
     this.toDraw();
-    this.watchKeyDown(); //注册
-    oWaveWrap.addEventListener(
-      "mousewheel",
-      (ev) => this.wheelOnWave(ev),
-      {passive: false},
-    );
   }
 }

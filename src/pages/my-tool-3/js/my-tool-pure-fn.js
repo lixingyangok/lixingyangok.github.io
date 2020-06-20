@@ -28,12 +28,11 @@ export function secToStr(fSecond){
 // AudioBuffer.duration  // 时长：双精度型（单位为秒）
 // AudioBuffer.numberOfChannels  // 通道数：整形
 // ▼计算波峰、波谷
-export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
+export function getPeaks(buffer, iPerSecPx, left=0, iCanvasWidth=500) {
   const oChannel = buffer.getChannelData(0);
-  // const sampleSize = Math.round(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
-  const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
+  const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素 = xxxx
   const aPeaks = [];
-  let idx = left || 0;
+  let idx = left;
   const last = idx + iCanvasWidth;
   while (idx <= last) {
     let start = idx * sampleSize;
@@ -56,6 +55,7 @@ export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
     duration: buffer.duration,
   };
 }
+
 export async function getMp3() {
   const res = await fetch(`./static/${fileName}.mp3`);
   // console.log('音频返回', res);
