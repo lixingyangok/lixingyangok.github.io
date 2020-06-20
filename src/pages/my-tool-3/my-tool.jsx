@@ -31,7 +31,7 @@ export default class Tool extends window.mix(
       duration: 0, //音频长度（秒
       timer: null, //定时器1
       timer02: null, //定时器2
-      iCurLine: 1, //当前行
+      iCurLine: 0, //当前行
       oFirstLine, //默认行
       aTimeLine: [oFirstLine], //字幕
       fileName: "", //文件名
@@ -63,7 +63,11 @@ export default class Tool extends window.mix(
           onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
         >
-          <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} >
+          {/* onMouseDown={ev => this.clickOnWave(ev)} */}
+          <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} 
+            onContextMenu={ev => this.clickOnWave(ev)}
+            onClick={ev => this.clickOnWave(ev)}
+          >
             <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
@@ -71,7 +75,7 @@ export default class Tool extends window.mix(
                   <cpnt.Region key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
                     style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
-                    onClick={() => this.toPlay(idx)}
+                    onMouseDown={ev => this.clickOnWave(ev)}
                   >
                     {idx + 1}
                   </cpnt.Region>
@@ -156,9 +160,9 @@ export default class Tool extends window.mix(
     );
     // ▼加载
     const buffer = await fn.getMp3();
-    const sText = await fn.getText();
-    const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
-    this.setState({ buffer, aTimeLine });
+    // const sText = await fn.getText();
+    // const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
+    this.setState({ buffer, /* aTimeLine */ });
     this.bufferToPeaks();
     this.toDraw();
   }

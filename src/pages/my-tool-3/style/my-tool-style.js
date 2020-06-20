@@ -57,6 +57,7 @@ export const TimeBar = styled.div`
   position: relative;
   height: 100%;
   background: rgba(0,0,0,0.1);
+  z-index: 2;
   .second-mark{
     box-sizing: border-box;
     display: inline-block;

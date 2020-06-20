@@ -13,7 +13,7 @@ export default class {
       // 
       'alt + 74': () => this.previousAndNext(-1), // j
       'alt + 75': () => this.previousAndNext(1), // k
-      'alt + 188': () => this.changeWaveHeigh(-1), // ,
+      'alt + 188': () => this.changeWaveHeigh(-1), // ,  //缩放声波的高度
       'alt + 190': () => this.changeWaveHeigh(1), // .
       'alt + 85': () => this.fixRegion('start', -0.35), // u
       'alt + 73': () => this.fixRegion('start', 0.35), // i
@@ -30,7 +30,7 @@ export default class {
       const alt = altKey ? 'alt + ' : '';
       const key = ctrl + shift + alt + keyCode;
       const theFn = fnLib[key];
-      console.log('按下：', keyCode);
+      // console.log('按下：', keyCode);
       if (!theFn) return;
       theFn.bind(this)();
       ev.preventDefault();
@@ -186,6 +186,23 @@ export default class {
   wheelOnSpan(ev) {
     const { altKey, ctrlKey, shiftKey, nativeEvent: { deltaY } } = ev;
     if (0) console.log(ctrlKey, shiftKey, altKey, deltaY);
+  }
+  clickOnWave(ev){
+    ev.preventDefault();
+    ev.stopPropagation();
+    console.log(ev.button, ev.clientX);
+    const {fPerSecPx, aTimeLine, iCurLine} = this.state;
+    const {offsetLeft, scrollLeft} = this.oWaveWrap.current;
+    const iLeftPx = ev.clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
+    const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
+    const keyName = ({ //0-2 = 左键-右键
+      '0': 'start',
+      '2': 'end',
+    }[ev.button]);
+    aTimeLine[iCurLine][keyName] = iNowSec;
+    this.setState({aTimeLine});
+    console.log('点击当前秒', iNowSec);
+    return false;
   }
 }
 
