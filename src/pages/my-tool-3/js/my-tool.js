@@ -48,6 +48,7 @@ export default class {
       Context.fillStyle = '#4ddc4d';
       Context.fillRect(idx, halfHeight, 1, 1);
     }
+    this.setState({drawing: false});
     return oCanvas;
   }
   async toPlay(iCurLine) {

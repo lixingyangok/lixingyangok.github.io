@@ -30,7 +30,7 @@ export default class {
       const alt = altKey ? 'alt + ' : '';
       const key = ctrl + shift + alt + keyCode;
       const theFn = fnLib[key];
-      // console.log('按下：', keyCode);
+      console.log('按下：', keyCode);
       if (!theFn) return;
       theFn.bind(this)();
       ev.preventDefault();
@@ -113,25 +113,35 @@ export default class {
   }
   // ▼横向缩放。接收一个事件对象
   zoomWave(ev){
-    console.time('zoomWave');
+    if (this.state.drawing) return;
+    const {perSecPx: perSecPxOld, fPerSecPx, buffer} = this.state;
+    const {clientX, deltaY} = ev;
+    const [min, max] = [30, 200]; //每秒最小/最大px
+    if ((perSecPxOld<=min && deltaY>=0) || (perSecPxOld>=max && deltaY<=0)){
+      console.log('进来了');
+      this.setState({drawing: false});
+      return;
+    }
+    this.setState({drawing: true});
     const oWaveWrap = this.oWaveWrap.current;
     const {offsetLeft, scrollLeft} = oWaveWrap;
-    const {clientX, deltaY} = ev;
-    const {perSecPx: perSecPxOld} = this.state;
     const iLeftPx = clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
-    const iNowSec = iLeftPx / perSecPxOld; //当前指向时间（秒）
+    const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
+    console.log(`${~~(iNowSec/60)}分 ${iNowSec%60}秒`);
     const perSecPx = (() => {
-      const iDirection = 10 * (deltaY <= 0 ? 1 : -1);
+      const iDirection = 30 * (deltaY <= 0 ? 1 : -1);
       let result = perSecPxOld + iDirection;
-      const [min, max] = [20, 200]; //每秒最小/最大px
       if (result < min) result = min;
       else if (result > max) result = max;
       return result;
     })();
-    const iNewLeftPx = (iNowSec * perSecPx) - (clientX - offsetLeft);
-    oWaveWrap.scrollTo(iNewLeftPx, 0);
-    console.timeEnd('zoomWave');
+    const sampleSize = ~~(buffer.sampleRate / perSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
+    const oneScPx = buffer.length / sampleSize / buffer.duration;
+    const iNewLeftPx = (iNowSec * oneScPx) - (clientX - offsetLeft);
     this.setState({perSecPx});
+    oWaveWrap.scrollTo(iNewLeftPx, 0);
+    console.log('前往', iNewLeftPx);
+    console.log('到达', oWaveWrap.scrollLeft);
   }
   // 改变波形高度
   changeWaveHeigh(deltaY) {
@@ -148,14 +158,13 @@ export default class {
   }
   // 监听滚动
   onScrollFn(ev) {
-    console.log('滚动了');
     const oCanvas = this.oCanvas.current;
     const left = ev.target.scrollLeft;
     oCanvas.style.left = left + 'px';
     const {buffer, perSecPx} = this.state;
     const {offsetWidth} = this.oWaveWrap.current;
-    const {aPeaks} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
-    this.setState({aPeaks});
+    const {aPeaks, fPerSecPx} = fn.getPeaks(buffer, perSecPx, left, offsetWidth);
+    this.setState({aPeaks, fPerSecPx});
     this.toDraw(aPeaks);
   }
   // ▼在波形上滚动

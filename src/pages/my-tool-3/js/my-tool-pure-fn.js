@@ -51,7 +51,7 @@ export function getPeaks(buffer, perSecPx, left=0, iCanvasWidth=500) {
     idx++;
   }
   return {
-    oneScPx: buffer.length / sampleSize / buffer.duration,
+    fPerSecPx: buffer.length / sampleSize / buffer.duration,
     aPeaks: aPeaks.slice(left*2),
     duration: buffer.duration,
   };

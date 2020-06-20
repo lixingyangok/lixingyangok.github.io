@@ -39,6 +39,8 @@ export default class Tool extends window.mix(
       iHeight: 50,
       iCanvasHeight: 150,
       perSecPx: 135, //人为定义的每秒像素数
+      fPerSecPx: 0,
+      drawing: false,
     };
   }
   render() {
@@ -62,7 +64,7 @@ export default class Tool extends window.mix(
           style={{height: `${iCanvasHeight + 20}px`}}
         >
           <cpnt.TimeBar style={{ width: `${oneScPx * duration}px` }} >
-            <i className="pointer" ref={this.oPointer} />
+            <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
                 return (
