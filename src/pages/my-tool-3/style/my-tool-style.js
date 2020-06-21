@@ -23,7 +23,7 @@ export const WaveWrap = styled.div`
     top: 0px;
     height: 100%;
     min-width: 1px;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.5);
     z-index: 4;
     margin: 0;
     padding: 0;
@@ -34,7 +34,7 @@ export const WaveWrap = styled.div`
   .cur{
     border-color: transparent blue transparent red;
     border-width: 0 2px;
-    background: rgba(0,0,0,0);
+    background: none;
   }
   .pointer{
     position: absolute;

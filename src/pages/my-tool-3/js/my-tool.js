@@ -11,11 +11,22 @@ export default class {
   async goLine(idx) {
     // await new Promise(resolve => resolve(), 100);
     const oWaveWrap = this.oWaveWrap.current;
-    const { iPerSecPx, aTimeLine } = this.state;
-    const oAim = aTimeLine[idx] || aTimeLine[idx - 1];
-    const leftVal = iPerSecPx * oAim.start - 500;
-    oWaveWrap.scrollTo(leftVal, 0);
-    // 分界
+    const {scrollLeft, offsetWidth} = oWaveWrap;
+    const {fPerSecPx, aTimeLine} = this.state;
+    const {start, end, long} = aTimeLine[idx] || aTimeLine[idx - 1];
+    if (
+      (start * fPerSecPx < scrollLeft) || //【起点】超出可视区
+      (end * fPerSecPx > scrollLeft + offsetWidth) //【终点】超出可视区
+    ) {
+      const leftVal = (()=>{
+        const startPx = fPerSecPx * start;
+        const restPx = offsetWidth - long * fPerSecPx;
+        if (restPx<=0) return startPx - 20;
+        return startPx - restPx / 2;
+      })();
+      oWaveWrap.scrollTo(leftVal, 0);
+    }
+    // ▲波形定位，▼下方句子定位
     const oSententList = this.oSententList.current;
     const fHeight = (() => {
       const oneLineHeight = (oSententList.children[0] || {}).offsetHeight || 0;
