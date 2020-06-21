@@ -116,7 +116,7 @@ export default class {
     if (this.state.drawing) return; //防抖
     const {iPerSecPx: perSecPxOld, fPerSecPx, buffer} = this.state;
     const {clientX, deltaY} = ev;
-    const [min, max] = [30, 250]; //每秒最小/最大px
+    const [min, max, iStep] = [10, 250, 30]; //每秒最小/最大px
     if ((perSecPxOld<=min && deltaY>=0) || (perSecPxOld>=max && deltaY<=0)){
       return this.setState({drawing: false});
     }
@@ -125,10 +125,10 @@ export default class {
     const iLeftPx = clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
     const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
     const iPerSecPx = (() => {
-      const iDirection = 50 * (deltaY <= 0 ? 1 : -1);
+      const iDirection = iStep * (deltaY <= 0 ? 1 : -1);
       let result = perSecPxOld + iDirection;
-      if (result < min) result = min;
-      else if (result > max) result = max;
+      if (result < min) return min;
+      else if (result > max) return max;
       return result;
     })();
     const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
@@ -145,9 +145,7 @@ export default class {
   // 改变波形高度
   changeWaveHeigh(deltaY) {
     let { iHeight } = this.state;
-    const min = 10;
-    const max = 350;
-    const iStep = 10;
+    const [min, max, iStep] = [10, 350, 10];
     if (deltaY >= 0) iHeight += iStep;
     else iHeight -= iStep;
     if (iHeight < min) iHeight = min;
