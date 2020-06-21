@@ -38,8 +38,8 @@ export default class Tool extends window.mix(
       iHeight: 50,
       iCanvasHeight: 150,
       iPerSecPx: 55, //人为定义的每秒像素数
-      fPerSecPx: 0,
-      drawing: false,
+      fPerSecPx: 0, //实际每秒像素数
+      drawing: false, //是否在绘制中（用于防抖
       mouseDraggingFn: ()=>0,
     };
   }
