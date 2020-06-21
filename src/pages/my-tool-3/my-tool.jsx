@@ -41,6 +41,7 @@ export default class Tool extends window.mix(
       iPerSecPx: 55, //人为定义的每秒像素数
       fPerSecPx: 0,
       drawing: false,
+      mouseDraggingFn: ()=>0,
     };
   }
   render() {
@@ -66,8 +67,9 @@ export default class Tool extends window.mix(
           {/* onMouseDown={ev => this.clickOnWave(ev)} */}
           <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} 
             onContextMenu={ev => this.clickOnWave(ev)}
-            onClick={ev => this.clickOnWave(ev)}
+            onMouseDown={ev=>this.mouseDownFn(ev)}
           >
+            {/* onClick={ev => this.clickOnWave(ev)} */}
             <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
@@ -75,7 +77,6 @@ export default class Tool extends window.mix(
                   <cpnt.Region key={idx}
                     className={idx === iCurLine ? "cur region" : "region"}
                     style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
-                    onMouseDown={ev => this.clickOnWave(ev)}
                   >
                     {idx + 1}
                   </cpnt.Region>
@@ -153,8 +154,9 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
+    const oWaveWrap = this.oWaveWrap.current;
     this.watchKeyDown(); 
-    this.oWaveWrap.current.addEventListener(
+    this.oWaveWrap.current.addEventListener( //注册滚轮事件
       "mousewheel", ev => this.wheelOnWave(ev),
       {passive: false},
     );
@@ -165,5 +167,10 @@ export default class Tool extends window.mix(
     this.setState({ buffer, /* aTimeLine */ });
     this.bufferToPeaks();
     this.toDraw();
+    document.addEventListener('mouseup', ()=>{
+      oWaveWrap.removeEventListener(
+        'mousemove', this.state.mouseDraggingFn,
+      );
+    });
   }
 }

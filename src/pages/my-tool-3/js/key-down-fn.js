@@ -187,22 +187,28 @@ export default class {
     const { altKey, ctrlKey, shiftKey, nativeEvent: { deltaY } } = ev;
     if (0) console.log(ctrlKey, shiftKey, altKey, deltaY);
   }
+  // ▼处理右键点击事件
   clickOnWave(ev){
+    if (ev.button !== 2) return; // 只处理右键点击
+    this.setTime({end: this.getPointSec(ev)});
     ev.preventDefault();
     ev.stopPropagation();
-    console.log(ev.button, ev.clientX);
-    const {fPerSecPx, aTimeLine, iCurLine} = this.state;
-    const {offsetLeft, scrollLeft} = this.oWaveWrap.current;
-    const iLeftPx = ev.clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
-    const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
-    const keyName = ({ //0-2 = 左键-右键
-      '0': 'start',
-      '2': 'end',
-    }[ev.button]);
-    aTimeLine[iCurLine][keyName] = iNowSec;
-    this.setState({aTimeLine});
-    console.log('点击当前秒', iNowSec);
     return false;
+  }
+  // ▼拖动
+  mouseDragging(ev) { 
+    this.setTime({end: this.getPointSec(ev)});
+  }
+  // ▼处理左键点击和拖动
+  mouseDownFn(ev){
+    if (ev.button === 2) return; //不处理右键事件
+    const mouseDraggingFn = this.mouseDragging.bind(this);
+    const iNowSec = this.getPointSec(ev);
+    this.setTime({start: iNowSec});
+    this.oWaveWrap.current.addEventListener(
+      'mousemove', mouseDraggingFn,
+    );
+    this.setState({mouseDraggingFn});
   }
 }
 

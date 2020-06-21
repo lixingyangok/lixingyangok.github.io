@@ -56,7 +56,7 @@ export default class {
     const {aTimeLine, fPerSecPx} = this.state;
     clearTimeout(state.timer);
     clearInterval(state.timer02);
-    iCurLine = typeof iCurLine == 'number' ? iCurLine : state.iCurLine;
+    iCurLine = typeof iCurLine === 'number' ? iCurLine : state.iCurLine;
     const { long, end, start } = aTimeLine[iCurLine];
     const Audio = this.oAudio.current;
     const {style} = this.oPointer.current;
@@ -140,5 +140,25 @@ export default class {
     // ▲返回内容：{aPeaks, fPerSecPx, duration};
     this.setState({ ...obackData });
     return obackData.aPeaks;
+  }
+  // ▼得到点击处的秒数，收受一个事件对象
+  getPointSec({clientX}){
+    const {fPerSecPx} = this.state;
+    const {offsetLeft, scrollLeft} = this.oWaveWrap.current;
+    const iLeftPx = clientX - offsetLeft + scrollLeft; //鼠标左侧的px值
+    const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
+    return iNowSec;
+  }
+  setTime({start, end}){
+    const {aTimeLine, iCurLine} = this.state;
+    const oCurLine = aTimeLine[iCurLine];
+    if (typeof start === 'number'){
+      oCurLine.start = start;
+    }
+    if (typeof end === 'number'){
+      oCurLine.end = end;
+    }
+    aTimeLine[iCurLine] = oCurLine;
+    this.setState({aTimeLine});
   }
 }
