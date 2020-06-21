@@ -39,7 +39,7 @@ export default class {
     }
     document.onkeydown = toRunFn;
   }
-  // ▼上一句，下一句
+  // ▼切换当前句子（上一句，下一句）
   previousAndNext(iDirection) {
     const { aTimeLine, iCurLine } = this.state;
     let iCurLineNew = iCurLine + iDirection;
@@ -94,14 +94,12 @@ export default class {
     let fNewVal = oOld[sKey] + iDirection;
     if (fNewVal < 0) fNewVal = 0;
     if (previous && fNewVal < previous.end) {
-      fNewVal = previous.end + 0.1;
+      fNewVal = previous.end + 0.05;
     }
     if (next && fNewVal > next.start) {
-      fNewVal = next.start - 0.1;
+      fNewVal = next.start - 0.05;
     }
     this.setTime(sKey, fNewVal);
-    // aTimeLine[iCurLine] = { ...oOld, [sKey]: fNewVal };
-    // this.setState({ aTimeLine });
   }
   // ▼使其横向滚动
   scrollToFn(deltaY) {
@@ -119,7 +117,7 @@ export default class {
     if (this.state.drawing) return; //防抖
     const {iPerSecPx: perSecPxOld, fPerSecPx, buffer} = this.state;
     const {clientX, deltaY} = ev;
-    const [min, max, iStep] = [10, 250, 30]; //每秒最小/最大px
+    const [min, max, iStep] = [10, 250, 20]; //每秒最小/最大px
     if ((perSecPxOld<=min && deltaY>=0) || (perSecPxOld>=max && deltaY<=0)){
       return this.setState({drawing: false});
     }
@@ -196,9 +194,12 @@ export default class {
     const oWaveWrap = this.oWaveWrap.current;
     const downPoint = ev01.clientX; // 把落点提前准备出来
     this.setTime('start', this.getPointSec(ev01));
-    oWaveWrap.onmousemove = ev02=>{
+    oWaveWrap.onmousemove = ev02 => {
       const keyName = ev02.clientX >= downPoint ? 'end' : 'start';
       this.setTime(keyName, this.getPointSec(ev02));
+      ev02.preventDefault();
+      ev02.stopPropagation();
+      return false;
     };
     document.onmouseup = function(){
       oWaveWrap.onmousemove = ()=>0;
