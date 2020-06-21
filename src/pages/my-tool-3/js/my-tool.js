@@ -54,28 +54,29 @@ export default class {
   async toPlay(iCurLine) {
     const {state} = this;
     const {aTimeLine, fPerSecPx} = this.state;
-    clearTimeout(state.timer);
-    clearInterval(state.timer02);
+    clearInterval(state.playTimer); //把之前的关闭再说
     iCurLine = typeof iCurLine === 'number' ? iCurLine : state.iCurLine;
-    const { long, end, start } = aTimeLine[iCurLine];
+    const {start} = aTimeLine[iCurLine];
     const Audio = this.oAudio.current;
     const {style} = this.oPointer.current;
     style.left = `${start * fPerSecPx}px`;
     Audio.currentTime = start;
     Audio.play();
-    let timer = setTimeout(
-      ()=>Audio.pause(), long * 1000,
-    );
-    let timer02 = setInterval(() => {
-      const fPerSecPx = this.state.fPerSecPx;
-      const step = long * fPerSecPx / (long * 100);
+    const iSecFrequency = 100; //每秒执行次数
+    const playTimer = setInterval(() => {
+      const {fPerSecPx, aTimeLine} = this.state;
+      const {long, end} = aTimeLine[iCurLine];
+      const step = long * fPerSecPx / (long * iSecFrequency);
       const newLeft = Number.parseFloat(style.left) + step;
-      if (newLeft >= end * fPerSecPx) {
-        return clearInterval(this.state.timer02);
+      const fEndPx = end * fPerSecPx;
+      if (newLeft >= fEndPx || Audio.currentTime >= end) {
+        Audio.pause();
+        style.left = `${fEndPx}px`;
+        return clearInterval(this.state.playTimer);
       }
       style.left = `${newLeft}px`;
-    }, 10);
-    this.setState({timer, timer02, iCurLine});
+    }, 1000 / iSecFrequency);
+    this.setState({playTimer, iCurLine});
     this.goLine(iCurLine);
   }
   toExport() {
@@ -149,15 +150,36 @@ export default class {
     const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
     return iNowSec;
   }
-  setTime({start, end}){
+  // ▼
+  setTime(key, val){
     const {aTimeLine, iCurLine} = this.state;
     const oCurLine = aTimeLine[iCurLine];
-    if (typeof start === 'number'){
-      oCurLine.start = start;
+    const {start, end} = oCurLine;
+    // if (key === 'start') {
+    //   if (val <= end) oCurLine.start = val;
+    //   else {
+    //     oCurLine.start = end;
+    //     oCurLine.end = val;
+    //   }
+    // } else if (key==='end'){
+    //   if (val >= start) oCurLine.end = val;
+    //   else {
+    //     oCurLine.start = val;
+    //     oCurLine.end = start;
+    //   }
+    // }
+    if (key === 'start' && val > end) {
+      oCurLine.start = end;
+      oCurLine.end = val;
+    } else if (key==='end' && val < start){
+      oCurLine.start = val;
+      oCurLine.end = start;
+    } else {
+      oCurLine[key] = val;
     }
-    if (typeof end === 'number'){
-      oCurLine.end = end;
-    }
+    oCurLine.start_ = fn.secToStr(oCurLine.start);
+    oCurLine.end_ = fn.secToStr(oCurLine.end);
+    oCurLine.long = oCurLine.end - oCurLine.start;
     aTimeLine[iCurLine] = oCurLine;
     this.setState({aTimeLine});
   }

@@ -19,18 +19,17 @@ export default class Tool extends window.mix(
     super(props);
     const oFirstLine = {
       start_: "00:00:00,000",
-      end_: "00:00:19,000",
+      end_: "00:00:05,000",
       start: 0,
-      end: 9,
-      long: 9,
+      end: 5,
+      long: 5,
       text: "",
     };
     this.state = {
       buffer: {}, //音频数据
       aPeaks: [], //波形数据
       duration: 0, //音频长度（秒
-      timer: null, //定时器1
-      timer02: null, //定时器2
+      playTimer: null, // 定时器
       iCurLine: 0, //当前行
       oFirstLine, //默认行
       aTimeLine: [oFirstLine], //字幕
@@ -58,18 +57,15 @@ export default class Tool extends window.mix(
     const fPerSecPx = buffer.length / sampleSize / duration;
     return (
       <cpnt.Div>
-        {/* <audio src={fileSrc} ref={this.oAudio}/> */}
         <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} />
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
         >
-          {/* onMouseDown={ev => this.clickOnWave(ev)} */}
           <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} 
             onContextMenu={ev => this.clickOnWave(ev)}
             onMouseDown={ev=>this.mouseDownFn(ev)}
           >
-            {/* onClick={ev => this.clickOnWave(ev)} */}
             <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
@@ -154,7 +150,6 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
-    const oWaveWrap = this.oWaveWrap.current;
     this.watchKeyDown(); 
     this.oWaveWrap.current.addEventListener( //注册滚轮事件
       "mousewheel", ev => this.wheelOnWave(ev),
@@ -167,10 +162,5 @@ export default class Tool extends window.mix(
     this.setState({ buffer, /* aTimeLine */ });
     this.bufferToPeaks();
     this.toDraw();
-    document.addEventListener('mouseup', ()=>{
-      oWaveWrap.removeEventListener(
-        'mousemove', this.state.mouseDraggingFn,
-      );
-    });
   }
 }

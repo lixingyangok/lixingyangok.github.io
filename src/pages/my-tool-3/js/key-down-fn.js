@@ -103,7 +103,7 @@ export default class {
   // ▼使其横向滚动
   scrollToFn(deltaY) {
     const oDom = this.oWaveWrap.current;
-    const iLong = 300;
+    const iLong = 350;
     const newVal = (() => {
       let oldVal = oDom.scrollLeft;
       if (deltaY >= 0) return oldVal - iLong;
@@ -142,7 +142,6 @@ export default class {
     })();
     if (iNewLeftPx<=0) this.onScrollFn();
   }
-
   // 改变波形高度
   changeWaveHeigh(deltaY) {
     let { iHeight } = this.state;
@@ -190,25 +189,24 @@ export default class {
   // ▼处理右键点击事件
   clickOnWave(ev){
     if (ev.button !== 2) return; // 只处理右键点击
-    this.setTime({end: this.getPointSec(ev)});
+    this.setTime('end', this.getPointSec(ev));
     ev.preventDefault();
     ev.stopPropagation();
     return false;
   }
-  // ▼拖动
-  mouseDragging(ev) { 
-    this.setTime({end: this.getPointSec(ev)});
-  }
   // ▼处理左键点击和拖动
-  mouseDownFn(ev){
-    if (ev.button === 2) return; //不处理右键事件
-    const mouseDraggingFn = this.mouseDragging.bind(this);
-    const iNowSec = this.getPointSec(ev);
-    this.setTime({start: iNowSec});
-    this.oWaveWrap.current.addEventListener(
-      'mousemove', mouseDraggingFn,
-    );
-    this.setState({mouseDraggingFn});
+  mouseDownFn(ev01){
+    if (ev01.button !== 0) return; // 只处理左键点击
+    const oWaveWrap = this.oWaveWrap.current;
+    const downPoint = ev01.clientX; // 把落点提前准备出来
+    this.setTime('start', this.getPointSec(ev01));
+    oWaveWrap.onmousemove = ev02=>{
+      const keyName = ev02.clientX >= downPoint ? 'end' : 'start';
+      this.setTime(keyName, this.getPointSec(ev02));
+    };
+    document.onmouseup = function(){
+      oWaveWrap.onmousemove = ()=>0;
+    };
   }
 }
 
