@@ -18,11 +18,11 @@ export default class Tool extends window.mix(
   constructor(props) {
     super(props);
     const oFirstLine = {
-      start_: "00:00:00,000",
+      start_: "00:00:01,000",
       end_: "00:00:05,000",
-      start: 0,
+      start: 1,
       end: 5,
-      long: 5,
+      long: 4,
       text: "",
     };
     this.state = {
@@ -62,7 +62,7 @@ export default class Tool extends window.mix(
           onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
         >
-          <cpnt.TimeBar style={{ width: `${fPerSecPx * duration}px` }} 
+          <cpnt.TimeBar style={{width: `${fPerSecPx * duration}px`}} 
             onContextMenu={ev => this.clickOnWave(ev)}
             onMouseDown={ev=>this.mouseDownFn(ev)}
           >
@@ -103,15 +103,6 @@ export default class Tool extends window.mix(
             <Button onClick={() => this.toExport()}>导出</Button>&nbsp;
             <input type="file" onChange={(ev) => this.toImport(ev)} />
           </div>
-          <div>
-            <span className="zoom" onWheel={(ev) => this.wheelOnSpan(ev)}>
-              波形缩放
-            </span>
-            &nbsp;
-            <span className="zoom" onWheel={(ev) => this.wheelOnSpan(ev)}>
-              高度缩放
-            </span>
-          </div>
         </cpnt.BtnBar>
         {/* 分界 */}
         <cpnt.InputWrap>
@@ -130,10 +121,10 @@ export default class Tool extends window.mix(
           {aTimeLine.map((cur, idx) => {
             return (
               <li className={`one-line ${idx === iCurLine ? "cur" : ""}`}
-                key={idx} onClick={() => this.toPlay(idx)}
+                key={idx} onClick={() => this.goLine(idx)}
               >
                 <i className="idx"
-                  style={{ width: `${String(aTimeLine.length || 0).length}em` }}
+                  style={{width: `${String(aTimeLine.length || 0).length}em`}}
                 >
                   {idx + 1}
                 </i>

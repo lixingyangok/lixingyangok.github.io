@@ -78,12 +78,10 @@ export const Region = styled.span`
   color: white;
 `;
 
-
-
 export const BtnBar = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 15px 0;
+  margin: 15px 0 -5px;
 `;
 
 export const InputWrap = styled.div`
@@ -108,13 +106,17 @@ export const SentenceWrap = styled.ol`
   border-bottom: solid 1px #aaa;
   .one-line{
     line-height: 2;
-    border-top: solid 1px #aaa;
+    border: solid #aaa;
+    border-width: 1px 0 0;
     padding: 0 10px;
     display: flex;
     &[class~=cur],
     &:hover{
       background: #ceffe7;
       cursor: pointer;
+    }
+    &:last-child{
+      border-width: 1px 0;
     }
   }
   .idx{

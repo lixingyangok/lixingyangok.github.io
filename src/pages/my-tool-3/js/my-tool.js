@@ -9,7 +9,7 @@ export default class {
     this.setState({ aTimeLine });
   }
   async goLine(idx) {
-    await new Promise(resolve => resolve(), 100);
+    // await new Promise(resolve => resolve(), 100);
     const oWaveWrap = this.oWaveWrap.current;
     const { iPerSecPx, aTimeLine } = this.state;
     const oAim = aTimeLine[idx] || aTimeLine[idx - 1];
@@ -22,6 +22,7 @@ export default class {
       return oneLineHeight * (idx - 2);
     })();
     oSententList.scrollTo(0, fHeight);
+    this.setState({iCurLine: idx});
   }
   toDraw(aPeaks_) {
     const { iHeight } = this.state;
@@ -51,16 +52,17 @@ export default class {
     this.setState({drawing: false});
     return oCanvas;
   }
-  async toPlay(iCurLine) {
+  async toPlay(iCurLine, isFromHalf) {
     const {state} = this;
     const {aTimeLine, fPerSecPx} = this.state;
     clearInterval(state.playTimer); //把之前的关闭再说
     iCurLine = typeof iCurLine === 'number' ? iCurLine : state.iCurLine;
-    const {start} = aTimeLine[iCurLine];
+    const {start, long} = aTimeLine[iCurLine];
     const Audio = this.oAudio.current;
     const {style} = this.oPointer.current;
-    style.left = `${start * fPerSecPx}px`;
-    Audio.currentTime = start;
+    const fStartTime = start + (isFromHalf ? long / 2 : 0);
+    style.left = `${fStartTime * fPerSecPx}px`;
+    Audio.currentTime = fStartTime;
     Audio.play();
     const iSecFrequency = 100; //每秒执行次数
     const playTimer = setInterval(() => {
@@ -155,19 +157,6 @@ export default class {
     const {aTimeLine, iCurLine} = this.state;
     const oCurLine = aTimeLine[iCurLine];
     const {start, end} = oCurLine;
-    // if (key === 'start') {
-    //   if (val <= end) oCurLine.start = val;
-    //   else {
-    //     oCurLine.start = end;
-    //     oCurLine.end = val;
-    //   }
-    // } else if (key==='end'){
-    //   if (val >= start) oCurLine.end = val;
-    //   else {
-    //     oCurLine.start = val;
-    //     oCurLine.end = start;
-    //   }
-    // }
     if (key === 'start' && val > end) {
       oCurLine.start = end;
       oCurLine.end = val;

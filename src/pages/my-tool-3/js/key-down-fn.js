@@ -5,7 +5,8 @@ export default class {
   // ▼监听按键
   watchKeyDown() {
     const fnLib = {
-      '9': () => this.toPlay(), // enter
+      '192': () => this.toPlay(null, true), // `键
+      '9': () => this.toPlay(), // tab键
       // 
       'ctrl + 13': () => this.toPlay(), // enter
       'ctrl + 68': () => this.toDel(), // d
@@ -17,11 +18,11 @@ export default class {
       'alt + 190': () => this.changeWaveHeigh(1), // .
       'alt + 85': () => this.fixRegion('start', -0.35), // u
       'alt + 73': () => this.fixRegion('start', 0.35), // i
-      // 
-      'shift + alt + 85': () => this.fixRegion('start', -0.1), // n
-      'shift + alt + 73': () => this.fixRegion('start', 0.1), // m
-      'shift + alt + 74': () => this.fixRegion('end', -0.1), // <
-      'shift + alt + 75': () => this.fixRegion('end', 0.1), // >
+      // ▼微调
+      'shift + alt + 85': () => this.fixRegion('start', -0.1), // u
+      'shift + alt + 73': () => this.fixRegion('start', 0.1), // i
+      'shift + alt + 74': () => this.fixRegion('end', -0.1), // j
+      'shift + alt + 75': () => this.fixRegion('end', 0.1), // k
     }
     const toRunFn = ev => {
       const { ctrlKey, shiftKey, altKey, keyCode } = ev;
@@ -30,7 +31,7 @@ export default class {
       const alt = altKey ? 'alt + ' : '';
       const key = ctrl + shift + alt + keyCode;
       const theFn = fnLib[key];
-      // console.log('按下：', keyCode);
+      console.log('按下：', keyCode);
       if (!theFn) return;
       theFn.bind(this)();
       ev.preventDefault();
@@ -45,12 +46,12 @@ export default class {
     if (iCurLineNew < 0) iCurLineNew = 0;
     if (iCurLineNew > aTimeLine.length - 1) {
       const oLast = aTimeLine.slice(-1)[0];
-      const start = oLast.end + 0.1;
-      const end = oLast.end + 10.1;
+      const start = oLast.end + 0.05;
+      const end = oLast.end + 10.05;
       const oNewItem = {
         start,
         end,
-        long: 10.1,
+        long: end - start,
         text: '',
         start_: fn.secToStr(start),
         end_: fn.secToStr(end),
@@ -84,6 +85,7 @@ export default class {
     window.lf.setItem(fileName, aTimeLine);
     message.success('保存成功');
   }
+  // ▼微调区域
   fixRegion(sKey, iDirection) {
     const { aTimeLine, iCurLine } = this.state;
     const oOld = aTimeLine[iCurLine];
@@ -97,8 +99,9 @@ export default class {
     if (next && fNewVal > next.start) {
       fNewVal = next.start - 0.1;
     }
-    aTimeLine[iCurLine] = { ...oOld, [sKey]: fNewVal };
-    this.setState({ aTimeLine });
+    this.setTime(sKey, fNewVal);
+    // aTimeLine[iCurLine] = { ...oOld, [sKey]: fNewVal };
+    // this.setState({ aTimeLine });
   }
   // ▼使其横向滚动
   scrollToFn(deltaY) {
@@ -178,11 +181,6 @@ export default class {
     ev.preventDefault();
     ev.stopPropagation();
     ev.returnValue = false;
-  }
-  // ▼控制***
-  wheelOnSpan(ev) {
-    const { altKey, ctrlKey, shiftKey, nativeEvent: { deltaY } } = ev;
-    if (0) console.log(ctrlKey, shiftKey, altKey, deltaY);
   }
   // ▼处理右键点击事件
   clickOnWave(ev){
