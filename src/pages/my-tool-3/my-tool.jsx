@@ -3,12 +3,14 @@ import * as cpnt from "./style/my-tool-style.js";
 import theFn from "./js/my-tool.js";
 import keyDownFn from "./js/key-down-fn.js";
 import * as fn from "./js/my-tool-pure-fn.js";
+import MouseFn from './js/mouse-fn.js';
 import {Button} from "antd";
 
 export default class Tool extends window.mix(
   React.Component,
   theFn,
-  keyDownFn
+  keyDownFn,
+  MouseFn,
 ) {
   oCanvas = React.createRef();
   oAudio = React.createRef();
