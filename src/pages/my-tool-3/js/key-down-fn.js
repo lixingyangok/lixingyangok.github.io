@@ -1,43 +1,46 @@
 import * as fn from './my-tool-pure-fn.js';
 import { message } from 'antd';
+import keyMap from './key-map.js';
 
 export default class {
-  // ▼监听按键
-  watchKeyDown() {
+  getFn(keyStr){
     const fnLib = {
-      '192': () => this.toPlay(null, true), // `键
-      '9': () => this.toPlay(), // tab键
-      // 
-      'ctrl + 13': () => this.toPlay(), // enter
-      'ctrl + 68': () => this.toDel(), // d
-      'ctrl + 83': () => this.toSave(), // s
-      // 
-      'alt + 74': () => this.previousAndNext(-1), // j
-      'alt + 75': () => this.previousAndNext(1), // k
-      'alt + 188': () => this.changeWaveHeigh(-1), // ,  //缩放声波的高度
-      'alt + 190': () => this.changeWaveHeigh(1), // .
-      'alt + 85': () => this.fixRegion('start', -0.35), // u
-      'alt + 73': () => this.fixRegion('start', 0.35), // i
-      // ▼微调
-      'shift + alt + 85': () => this.fixRegion('start', -0.1), // u
-      'shift + alt + 73': () => this.fixRegion('start', 0.1), // i
-      'shift + alt + 74': () => this.fixRegion('end', -0.1), // j
-      'shift + alt + 75': () => this.fixRegion('end', 0.1), // k
+      '`': () => this.toPlay(null, true),
+      'Tab': () => this.toPlay(),
+      // ctrl 系列
+      'ctrl + Enter': () => this.toPlay(),
+      'ctrl + d': () => this.toDel(),
+      'ctrl + s': () => this.toSave(),
+      // alt 系列
+      'alt + j': () => this.previousAndNext(-1),
+      'alt + k': () => this.previousAndNext(1),
+      'alt + ,': () => this.changeWaveHeigh(-1),
+      'alt + .': () => this.changeWaveHeigh(1),
+      'alt + u': () => this.fixRegion('start', -0.35),
+      'alt + i': () => this.fixRegion('start', 0.35),
+      // ▼ 其它，用于微调
+      'shift + alt + u': () => this.fixRegion('start', -0.1),
+      'shift + alt + i': () => this.fixRegion('start', 0.1),
+      'shift + alt + j': () => this.fixRegion('end', -0.1),
+      'shift + alt + k': () => this.fixRegion('end', 0.1),
     }
-    const toRunFn = ev => {
-      const { ctrlKey, shiftKey, altKey, keyCode } = ev;
-      const ctrl = ctrlKey ? 'ctrl + ' : '';
-      const shift = shiftKey ? 'shift + ' : '';
-      const alt = altKey ? 'alt + ' : '';
-      const key = ctrl + shift + alt + keyCode;
-      const theFn = fnLib[key];
-      console.log('按下：', keyCode);
-      if (!theFn) return;
-      theFn.bind(this)();
-      ev.preventDefault();
-      ev.stopPropagation();
-    }
-    document.onkeydown = toRunFn;
+    const fn = fnLib[keyStr];
+    if (!fn) return false;
+    return fn.bind(this);
+  }
+  // ▼按下按键事件
+  keyDowned(ev){
+    const {ctrlKey, shiftKey, altKey, keyCode} = ev;
+    const ctrl = ctrlKey ? 'ctrl + ' : '';
+    const shift = shiftKey ? 'shift + ' : '';
+    const alt = altKey ? 'alt + ' : '';
+    const keyStr = ctrl + shift + alt + keyMap[keyCode];
+    const theFn = this.getFn(keyStr);
+    console.log('按下：', keyCode);
+    if (!theFn) return;
+    theFn();
+    ev.preventDefault();
+    ev.stopPropagation();
   }
   // ▼切换当前句子（上一句，下一句）
   previousAndNext(iDirection) {

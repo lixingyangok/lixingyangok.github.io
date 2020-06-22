@@ -143,7 +143,7 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
-    this.watchKeyDown(); 
+    document.onkeydown = this.keyDowned.bind(this);
     this.oWaveWrap.current.addEventListener( //注册滚轮事件
       "mousewheel", ev => this.wheelOnWave(ev),
       {passive: false},
