@@ -9,7 +9,7 @@ export const aNavData = [{
 },{
   name: '工具',
   path: '/practicing',
-  // target:'_blank',
+  target:'_blank',
   component: React.lazy(() => import('pages/my-tool-3/my-tool.jsx')),
 },{
   name: '关于',
@@ -18,11 +18,11 @@ export const aNavData = [{
 }];
 
 export default function () {
-  // const oLocation = useLocation();
-  // const isPracticing = oLocation.pathname.includes('/practicing');
-  // if (isPracticing) {
-  //   return <div></div>;
-  // }
+  const oLocation = useLocation();
+  const isPracticing = oLocation.pathname.includes('/practicing');
+  if (isPracticing) {
+    return <div></div>;
+  }
   return <nav>
     <cpnt.Ul>
       {aNavData.map((cur,idx)=>{

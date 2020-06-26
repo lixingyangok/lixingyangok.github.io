@@ -1,16 +1,18 @@
 import React from "react";
 import * as cpnt from "./style/my-tool-style.js";
-import theFn from "./js/my-tool.js";
-import keyDownFn from "./js/key-down-fn.js";
 import * as fn from "./js/my-tool-pure-fn.js";
-import MouseFn from './js/mouse-fn.js';
 import {Button} from "antd";
+import coreFn from "./js/core-fn.js";
+import keyDownFn from "./js/key-down-fn.js";
+import MouseFn from './js/mouse-fn.js';
+import fileFn from './js/file-fn.js';
 
 export default class Tool extends window.mix(
   React.Component,
-  theFn,
+  coreFn,
   keyDownFn,
   MouseFn,
+  fileFn,
 ) {
   oCanvas = React.createRef();
   oAudio = React.createRef();
@@ -71,26 +73,22 @@ export default class Tool extends window.mix(
             <i className="pointer" ref={this.oPointer}/>
             <section>
               {aTimeLine.map(({ start, end }, idx) => {
-                return (
-                  <cpnt.Region key={idx}
-                    className={idx === iCurLine ? "cur region" : "region"}
-                    style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
-                  >
-                    {idx + 1}
-                  </cpnt.Region>
-                );
+                return <cpnt.Region key={idx}
+                  className={idx === iCurLine ? "cur region" : "region"}
+                  style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
+                >
+                  {idx + 1}
+                </cpnt.Region>
               })}
             </section>
             {/* ▼刻度（秒）*/}
             <section>
               {[...Array(~~duration).keys()].map((cur, idx) => {
-                return (
-                  <span className="second-mark" key={cur}
-                    style={{ width: fPerSecPx + "px", left: idx*fPerSecPx + "px" }}
-                  >
-                    {cur}
-                  </span>
-                );
+                return <span className="second-mark" key={cur}
+                  style={{ width: fPerSecPx + "px", left: idx*fPerSecPx + "px" }}
+                >
+                  {cur}
+                </span>;
               })}
             </section>
           </cpnt.TimeBar>
@@ -143,17 +141,24 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
-    document.onkeydown = this.keyDowned.bind(this);
     this.oWaveWrap.current.addEventListener( //注册滚轮事件
-      "mousewheel", ev => this.wheelOnWave(ev),
+      "mousewheel",
+      ev => this.wheelOnWave(ev),
       {passive: false},
     );
+    const {pushFiles} = this;
+    document.onkeydown = this.keyDowned.bind(this);
+    document.addEventListener("drop", pushFiles);		// ▼拖动释放（未必会执行
+    // ▲有动作，▼无动作，仍然要绑定事件，因为要借此阻止默认事件
+    document.addEventListener("dragleave", pushFiles);	// ▼拖动离开（未必会执行
+    document.addEventListener("dragenter", pushFiles);	// ▼拖动进入
+    document.addEventListener("dragover", pushFiles);	// ▼拖动进行中
     // ▼加载
     const buffer = await fn.getMp3();
-    const sText = await fn.getText();
-    const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
-    this.setState({buffer, aTimeLine});
-    this.bufferToPeaks();
-    this.toDraw();
+    // const sText = await fn.getText();
+    // const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
+    // this.setState({buffer, aTimeLine});
+    // this.bufferToPeaks();
+    // this.toDraw();
   }
 }

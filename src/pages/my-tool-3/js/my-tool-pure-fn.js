@@ -58,6 +58,7 @@ export function getPeaks(buffer, iPerSecPx, left=0, iCanvasWidth=500) {
 
 export async function getMp3() {
   const res = await fetch(`./static/${fileName}.mp3`);
+  console.log('音频文件', res);
   // console.log('音频返回', res);
   const arrayBuffer = await res.arrayBuffer();
   let audioContext = new (window.AudioContext || window.webkitAudioContext)();

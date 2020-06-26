@@ -10,13 +10,19 @@ export const Ul = styled.ul`
   line-height: 50px;
   background: black;
   margin: 0;
-  display: ${props => props.hide ? "none" : "flex"};
+  display: flex;
 `;
 
 export const Li = styled.li`
-  margin-right: 20px;
+  list-style: none;
   a{
     display: block;
     color: white;
+    padding: 0 1.5em;
+  }
+  .active{
+    background: yellow;
+    color: black;
   }
 `;
+

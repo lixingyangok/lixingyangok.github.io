@@ -1,6 +1,10 @@
+/*
+ * @Author: 李星阳
+ * @LastEditors: 李星阳
+ * @Description: 
+ */ 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {mix} from './common/common.js';
