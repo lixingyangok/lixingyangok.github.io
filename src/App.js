@@ -5,8 +5,7 @@
  */ 
 import React, {Suspense} from 'react';
 import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
-import Navigation from './common/components/navigation.jsx';
-
+import Navigation, {aNavData} from './common/components/navigation/navigation.jsx';
 
 function App() {
   return <BrowserRouter>
@@ -15,9 +14,11 @@ function App() {
     <Suspense fallback={<div>Loading...</div>}>
       <Switch>
         <Redirect exact from="/" to="/index" ></Redirect>
-        <Route path="/index" component={React.lazy(() => import('./pages/index/index.jsx'))} />
-        <Route path="/practicing" component={React.lazy(() => import('./pages/my-tool-3/my-tool.jsx'))} />
-        <Route path="/about" component={React.lazy(() => import('./pages/about/about.jsx'))} />
+        {aNavData.map((cur,idx)=>{
+          return <Route key={idx}
+            path={cur.path} component={cur.component}
+          />
+        })}
       </Switch>
     </Suspense>
   </BrowserRouter>
