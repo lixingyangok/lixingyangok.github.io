@@ -1,5 +1,3 @@
-import * as fn from './my-tool-pure-fn.js';
-
 export default class {
   // ▼输入框文字改变
   valChanged(ev) {
@@ -118,11 +116,26 @@ export default class {
     } else {
       oCurLine[key] = val;
     }
-    oCurLine.start_ = fn.secToStr(oCurLine.start);
-    oCurLine.end_ = fn.secToStr(oCurLine.end);
+    oCurLine.start_ = this.secToStr(oCurLine.start);
+    oCurLine.end_ = this.secToStr(oCurLine.end);
     oCurLine.long = oCurLine.end - oCurLine.start;
     aTimeLine[iCurLine] = oCurLine;
     this.setState({aTimeLine});
+  }
+  // ▼时间轴的时间转秒
+  getSeconds(text) {
+    const [hour, minute, second, tail] = text.match(/\d+/g);
+    let number = (hour * 60 * 60) + (minute * 60) + `${second}.${tail}` * 1;
+    return number.toFixed(2) * 1;
+  };
+  // ▼秒-转为时间轴的时间
+  secToStr(fSecond){
+    let iHour = Math.floor(fSecond / 3600) + ''; //时
+    let iMinut = Math.floor((fSecond - iHour * 3600) / 60) + ''; //分
+    let fSec = fSecond - (iHour*3600 + iMinut*60) + ''; //秒
+    let [sec01, sec02='000'] = fSec.split('.');
+    const sTime = `${iHour.padStart(2, 0)}:${iMinut.padStart(2, 0)}:${sec01.padStart(2, 0)},${sec02.slice(0, 3).padEnd(3,0)}`;
+    return sTime;
   }
 }
 
