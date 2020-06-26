@@ -16,7 +16,7 @@ function App() {
       <Switch>
         <Redirect exact from="/" to="/index" ></Redirect>
         <Route path="/index" component={React.lazy(() => import('./pages/index/index.jsx'))} />
-        <Route path="/my-tool-3" component={React.lazy(() => import('./pages/my-tool-3/my-tool.jsx'))} />
+        <Route path="/practicing" component={React.lazy(() => import('./pages/my-tool-3/my-tool.jsx'))} />
         <Route path="/about" component={React.lazy(() => import('./pages/about/about.jsx'))} />
       </Switch>
     </Suspense>
