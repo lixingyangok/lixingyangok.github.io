@@ -15,6 +15,21 @@ export default class {
     if (!audioFile) return console.log('格式不支持');
     console.log('音频文件', audioFile, audioFile.arrayBuffer);
   }
+  // <input/>导入文件调用
+  async toImport(ev = {}) {
+    const { target = { files: [] } } = ev;
+    const file = target.files[0];
+    if (!file) return;
+    const fileName = file.name;
+    const fileSrc = URL.createObjectURL(file);
+    this.setState({fileName, fileSrc});
+    let buffer = await this.fileToBuffer(file);
+    this.showWaveByBuffer(buffer);
+    let aTimeLine = await window.lf.getItem(fileName);
+    aTimeLine = aTimeLine || [this.state.oFirstLine];
+    this.setState({ aTimeLine });
+  }
+
   // ▼音频数据转换波峰数据
   bufferToPeaks(perSecPx_, leftPoint = 0) {
     const oWaveWrap = this.oWaveWrap.current;
@@ -54,19 +69,7 @@ export default class {
     reader.readAsArrayBuffer(oFile);
     return promise;
   }
-  async toImport(ev = {}) {
-    const { target = { files: [] } } = ev;
-    const file = target.files[0];
-    if (!file) return;
-    const fileName = file.name;
-    const fileSrc = URL.createObjectURL(file);
-    this.setState({ fileName, fileSrc });
-    let buffer = await this.fileToBuffer(file);
-    this.showWaveByBuffer(buffer);
-    let aTimeLine = await window.lf.getItem(fileName);
-    aTimeLine = aTimeLine || [this.state.oFirstLine];
-    this.setState({ aTimeLine });
-  }
+
   toExport() {
     const { aTimeLine } = this.state;
     const aStr = aTimeLine.map(({ start_, end_, text }, idx) => {

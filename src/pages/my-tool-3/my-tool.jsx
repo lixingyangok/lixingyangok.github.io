@@ -55,13 +55,15 @@ export default class Tool extends window.mix(
       iCanvasHeight,
       duration,
       iPerSecPx,
+      fileSrc,
       // fPerSecPx,
     } = this.state;
     const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
     const fPerSecPx = buffer.length / sampleSize / duration;
     return (
       <cpnt.Div>
-        <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} />
+        {/* <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} /> */}
+        <audio src={fileSrc} ref={this.oAudio} />
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
