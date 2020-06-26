@@ -20,14 +20,14 @@ const Ul = styled.ul`
 export default function () {
   const aNavData = [
     {name: '首页', to: '/index'},
-    {name: '工具', to: '/my-tool-3'},
+    {name: '工具', to: '/practicing', target:'_blank'},
     {name: '关于', to: '/about'},
   ];
   return <nav>
-     <Ul>
+    <Ul>
       {aNavData.map((cur,idx)=>{
         return <li key={idx}>
-          <NavLink to={cur.to}>
+          <NavLink to={cur.to} target={cur.target || ''} >
             {cur.name}
           </NavLink>
         </li>

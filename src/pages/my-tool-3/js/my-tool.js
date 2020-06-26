@@ -141,7 +141,7 @@ export default class {
       fPerSecPx: fCanvasWidth / buffer.duration,
     });
     this.toDraw();
-    this.watchKeyDown();
+    // this.watchKeyDown();
   }
   // ▼音频数据转换波峰数据
   bufferToPeaks(perSecPx_, leftPoint=0) {
