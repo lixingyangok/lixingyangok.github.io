@@ -9,27 +9,30 @@ export default class {
   // ▼拖入文件
   pushFiles(ev) {
     ev.preventDefault();
-    if (ev.type != 'drop') return;
-    const aFiles = [...ev.dataTransfer.files];
+    if (ev.type !== 'drop') return;
+    this.getFileToInit(ev.dataTransfer.files);
+  }
+  // ▼input导入文件调用
+  toImport(ev) {
+    const {target} = ev;
+    if (!target.files.length) return;
+    this.getFileToInit(target.files);
+    target.value = '';
+  }
+  async getFileToInit(oFiles){
+    const aFiles = [...oFiles];
     const audioFile = aFiles.find(cur => cur.arrayBuffer);
     if (!audioFile) return console.log('格式不支持');
-    console.log('音频文件', audioFile, audioFile.arrayBuffer);
-  }
-  // <input/>导入文件调用
-  async toImport(ev = {}) {
-    const { target = { files: [] } } = ev;
-    const file = target.files[0];
-    if (!file) return;
-    const fileName = file.name;
-    const fileSrc = URL.createObjectURL(file);
+    // console.log('格式正确');
+    const fileName = audioFile.name;
+    const fileSrc = URL.createObjectURL(audioFile);
     this.setState({fileName, fileSrc});
-    let buffer = await this.fileToBuffer(file);
+    let buffer = await this.fileToBuffer(audioFile);
     this.showWaveByBuffer(buffer);
     let aTimeLine = await window.lf.getItem(fileName);
     aTimeLine = aTimeLine || [this.state.oFirstLine];
     this.setState({ aTimeLine });
   }
-
   // ▼音频数据转换波峰数据
   bufferToPeaks(perSecPx_, leftPoint = 0) {
     const oWaveWrap = this.oWaveWrap.current;

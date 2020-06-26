@@ -1,6 +1,6 @@
 import React from "react";
 import * as cpnt from "./style/my-tool-style.js";
-import * as fn from "./js/my-tool-pure-fn.js";
+// import * as fn from "./js/my-tool-pure-fn.js";
 import {Button} from "antd";
 import coreFn from "./js/core-fn.js";
 import keyDownFn from "./js/key-down-fn.js";
@@ -63,7 +63,7 @@ export default class Tool extends window.mix(
     return (
       <cpnt.Div>
         {/* <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} /> */}
-        <audio src={fileSrc} ref={this.oAudio} />
+        <audio src={fileSrc} ref={this.oAudio}/>
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={() => this.onScrollFn()}
           style={{height: `${iCanvasHeight + 20}px`}}
@@ -103,39 +103,33 @@ export default class Tool extends window.mix(
             </Button>
             &nbsp;
             <Button onClick={() => this.toExport()}>导出</Button>&nbsp;
-            <input type="file" onChange={(ev) => this.toImport(ev)} />
+            <input type="file" onChange={ev => this.toImport(ev)} multiple="multiple"/>
           </div>
         </cpnt.BtnBar>
         {/* 分界 */}
         <cpnt.InputWrap>
           {(() => {
             if (!aTimeLine[iCurLine]) return <span />;
-            return (
-              <textarea value={(aTimeLine[iCurLine] || {}).text}
-                onChange={(ev) => this.valChanged(ev)}
-                onKeyDown={(ev) => this.enterKeyDown(ev)}
-              />
-            );
+            return <textarea value={(aTimeLine[iCurLine] || {}).text}
+              onChange={(ev) => this.valChanged(ev)}
+              onKeyDown={(ev) => this.enterKeyDown(ev)}
+            />;
           })()}
         </cpnt.InputWrap>
         {/* 分界 */}
         <cpnt.SentenceWrap ref={this.oSententList}>
           {aTimeLine.map((cur, idx) => {
-            return (
-              <li className={`one-line ${idx === iCurLine ? "cur" : ""}`}
-                key={idx} onClick={() => this.goLine(idx)}
-              >
-                <i className="idx"
-                  style={{width: `${String(aTimeLine.length || 0).length}em`}}
-                >
-                  {idx + 1}
-                </i>
-                <span className="time">
-                  <em>{cur.start_}</em>&nbsp;-&nbsp;<em>{cur.end_}</em>
-                </span>
-                {cur.text}
-              </li>
-            );
+            return <li className={`one-line ${idx === iCurLine ? "cur" : ""}`}
+              key={idx} onClick={() => this.goLine(idx)}
+            >
+              <i className="idx" style={{width: `${String(aTimeLine.length || 0).length}em`}} >
+                {idx + 1}
+              </i>
+              <span className="time">
+                <em>{cur.start_}</em>&nbsp;-&nbsp;<em>{cur.end_}</em>
+              </span>
+              {cur.text}
+            </li>;
           })}
         </cpnt.SentenceWrap>
       </cpnt.Div>
@@ -148,15 +142,15 @@ export default class Tool extends window.mix(
       ev => this.wheelOnWave(ev),
       {passive: false},
     );
-    const {pushFiles} = this;
     document.onkeydown = this.keyDowned.bind(this);
+    const pushFiles = this.pushFiles.bind(this);
     document.addEventListener("drop", pushFiles);		// ▼拖动释放（未必会执行
     // ▲有动作，▼无动作，仍然要绑定事件，因为要借此阻止默认事件
     document.addEventListener("dragleave", pushFiles);	// ▼拖动离开（未必会执行
     document.addEventListener("dragenter", pushFiles);	// ▼拖动进入
     document.addEventListener("dragover", pushFiles);	// ▼拖动进行中
     // ▼加载
-    const buffer = await fn.getMp3();
+    // const buffer = await fn.getMp3();
     // const sText = await fn.getText();
     // const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
     // this.setState({buffer, aTimeLine});

@@ -1,6 +1,7 @@
 import * as fn from './my-tool-pure-fn.js';
 
 export default class {
+  // ▼输入框文字改变
   valChanged(ev) {
     const text = ev.target.value;
     if (!text[0] || !text[text.length - 1]) return;
@@ -8,6 +9,7 @@ export default class {
     aTimeLine[iCurLine].text = text;
     this.setState({ aTimeLine });
   }
+  // ▼跳至某行
   async goLine(idx) {
     // await new Promise(resolve => resolve(), 100);
     const oWaveWrap = this.oWaveWrap.current;
@@ -35,6 +37,7 @@ export default class {
     oSententList.scrollTo(0, fHeight);
     this.setState({iCurLine: idx});
   }
+  // ▼绘制
   toDraw(aPeaks_) {
     const { iHeight } = this.state;
     const aPeaks = aPeaks_ || this.state.aPeaks;
@@ -63,6 +66,7 @@ export default class {
     this.setState({drawing: false});
     return oCanvas;
   }
+  // ▼播放
   async toPlay(iCurLine, isFromHalf) {
     const {state} = this;
     const {aTimeLine, fPerSecPx} = this.state;
@@ -100,7 +104,7 @@ export default class {
     const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
     return iNowSec;
   }
-  // ▼
+  // ▼设定时间
   setTime(key, val){
     const {aTimeLine, iCurLine} = this.state;
     const oCurLine = aTimeLine[iCurLine];
