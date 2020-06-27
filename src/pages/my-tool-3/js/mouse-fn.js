@@ -12,6 +12,7 @@ export default class {
     const downPoint = ev01.clientX; // 把落点提前准备出来
     this.setTime('start', this.getPointSec(ev01));
     oWaveWrap.onmousemove = ev02 => {
+      console.log('拖动中');
       const keyName = ev02.clientX >= downPoint ? 'end' : 'start';
       this.setTime(keyName, this.getPointSec(ev02));
       ev02.preventDefault();

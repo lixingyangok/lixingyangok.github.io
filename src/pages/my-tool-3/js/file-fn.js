@@ -21,17 +21,20 @@ export default class {
   // ▼过滤出正确的文件
   async getCorrectFile(oFiles){
     const aFiles = [...oFiles];
+    console.log(aFiles);
     const audioFile = aFiles.find(cur => {
       const aArr = ["audio/mpeg"];
       return aArr.includes(cur.type);
     });
     if (!audioFile) return this.message.error('不支持此文件');
-    this.message.success('导入文件成功');
-    this.cleanCanvas();
     this.getFileToDraw(audioFile);
+    const srtFile = aFiles.find(cur => {
+      return cur.name.split('.').pop() === 'srt';
+    });
   }
   // ▼绘制波形
   async getFileToDraw(audioFile){
+    this.cleanCanvas();
     this.setState({loading: true});
     const fileName = audioFile.name;
     const fileSrc = URL.createObjectURL(audioFile);
@@ -108,5 +111,28 @@ export default class {
       download: `字幕文件-${new Date() * 1}.srt`,
       href: URL.createObjectURL(blob),
     }).click();
+  }
+  // ▼处理字幕文件
+  getTimeLine(text, getArr) {
+    let strArr = text.split('\n');
+    const aLine = [];
+    strArr = strArr.filter((cur, idx) => {
+      const isTime = /\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/.test(cur);
+      if (!isTime) return false;
+      aLine.push(strArr[idx+1]);
+      return isTime;
+    });
+    return strArr.map((cur, idx) => {
+      const [aa, bb] = cur.split(' --> ');
+      const [start, end] = [this.getSeconds(aa), this.getSeconds(bb)];
+      return {
+        start_: aa,
+        end_: bb,
+        start,
+        end,
+        long: (end - start).toFixed(2) * 1,
+        text: aLine[idx].trim(),
+      };
+    });
   }
 };

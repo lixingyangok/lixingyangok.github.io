@@ -26,26 +26,4 @@ export async function getText() {
   return await res.text();
 };
 
-export function getTimeLine(text, getArr) {
-  let strArr = text.split('\n');
-  const aLine = [];
-  strArr = strArr.filter((cur, idx) => {
-    const isTime = /\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/.test(cur);
-    if (!isTime) return false;
-    aLine.push(strArr[idx+1]);
-    return isTime;
-  });
-  return strArr.map((cur, idx) => {
-    const [aa, bb] = cur.split(' --> ');
-    const [start, end] = [this.getSeconds(aa), this.getSeconds(bb)];
-    return {
-      start_: aa,
-      end_: bb,
-      start,
-      end,
-      long: (end - start).toFixed(2) * 1,
-      text: aLine[idx].trim(),
-    };
-  });
-};
 

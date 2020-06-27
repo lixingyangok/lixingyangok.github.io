@@ -135,13 +135,12 @@ export default class Tool extends window.mix(
   // ▼以下是生命周期
   async componentDidMount() {
     this.cleanCanvas();
-    this.oWaveWrap.current.addEventListener( //注册滚轮事件
-      "mousewheel",
-      ev => this.wheelOnWave(ev),
-      {passive: false},
+    const oWaveWrap = this.oWaveWrap.current;
+    oWaveWrap.addEventListener( //注册滚轮事件
+      "mousewheel", ev => this.wheelOnWave(ev), {passive: false},
     );
-    document.onkeydown = this.keyDowned.bind(this);
     const pushFiles = this.pushFiles.bind(this);
+    document.onkeydown = this.keyDowned.bind(this);
     document.addEventListener("drop", pushFiles);		// ▼拖动释放
     document.addEventListener("dragleave", pushFiles);	// ▼拖动离开（未必会执行
     document.addEventListener("dragenter", pushFiles);	// ▼拖动进入
