@@ -1,7 +1,7 @@
 import React from "react";
 import * as cpnt from "./style/my-tool-style.js";
 import * as fn from "./js/my-tool-pure-fn.js";
-import {Button} from "antd";
+import {Button, Spin} from "antd";
 import coreFn from "./js/core-fn.js";
 import keyDownFn from "./js/key-down-fn.js";
 import MouseFn from './js/mouse-fn.js';
@@ -40,11 +40,12 @@ export default class Tool extends window.mix(
       aTimeLine: [oFirstLine], //字幕
       fileName: "", //文件名
       fileSrc: "", //文件地址
-      iHeight: 50,
+      iHeight: 50, // 波形高
       iCanvasHeight: 150,
       iPerSecPx: 55, //人为定义的每秒像素数
       fPerSecPx: 0, //实际每秒像素数
       drawing: false, //是否在绘制中（用于防抖
+      loading: false, //
       mouseDraggingFn: ()=>0,
     };
   }
@@ -57,6 +58,7 @@ export default class Tool extends window.mix(
     const fPerSecPx = buffer.length / sampleSize / duration;
     return (
       <cpnt.Div>
+        <Spin spinning={this.state.loading} size="large"></Spin>
         {/* <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} /> */}
         <audio src={fileSrc} ref={this.oAudio}/>
         <cpnt.WaveWrap ref={this.oWaveWrap}
@@ -132,6 +134,7 @@ export default class Tool extends window.mix(
   }
   // ▼以下是生命周期
   async componentDidMount() {
+    this.cleanCanvas();
     this.oWaveWrap.current.addEventListener( //注册滚轮事件
       "mousewheel",
       ev => this.wheelOnWave(ev),

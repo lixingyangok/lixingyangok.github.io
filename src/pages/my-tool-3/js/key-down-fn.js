@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import keyMap from './key-map.js';
 
 export default class {
@@ -83,10 +82,10 @@ export default class {
   }
   // ▼保存字幕到本地
   async toSave() {
-    const { aTimeLine, fileName } = this.state;
+    const {aTimeLine, fileName} = this.state;
     if (!fileName) return;
     window.lf.setItem(fileName, aTimeLine);
-    message.success('保存成功');
+    this.message.success('保存成功');
   }
   // ▼微调区域
   fixRegion(sKey, iDirection) {

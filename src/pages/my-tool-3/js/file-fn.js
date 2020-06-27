@@ -9,71 +9,53 @@ export default class {
   pushFiles(ev) {
     ev.preventDefault();
     if (ev.type !== 'drop') return;
-    this.getFileToInit(ev.dataTransfer.files);
+    this.getCorrectFile(ev.dataTransfer.files);
   }
   // ▼input导入文件
   toImport(ev) {
     const {target} = ev;
     if (!target.files.length) return;
-    this.getFileToInit(target.files);
+    this.getCorrectFile(target.files);
     target.value = '';
   }
-  async getFileToInit(oFiles){
+  // ▼过滤出正确的文件
+  async getCorrectFile(oFiles){
     const aFiles = [...oFiles];
     const audioFile = aFiles.find(cur => {
       const aArr = ["audio/mpeg"];
       return aArr.includes(cur.type);
     });
-    if (!audioFile) return console.log('格式不支持');
-    // console.log('格式正确');
+    if (!audioFile) return this.message.error('不支持此文件');
+    this.message.success('导入文件成功');
+    this.cleanCanvas();
+    this.getFileToDraw(audioFile);
+  }
+  // ▼绘制波形
+  async getFileToDraw(audioFile){
+    this.setState({loading: true});
     const fileName = audioFile.name;
     const fileSrc = URL.createObjectURL(audioFile);
-    this.setState({fileName, fileSrc});
-    let buffer = await this.fileToBuffer(audioFile);
-    this.showWaveByBuffer(buffer);
-    let aTimeLine = await window.lf.getItem(fileName);
-    aTimeLine = aTimeLine || [this.state.oFirstLine];
-    this.setState({aTimeLine});
-  }
-  showWaveByBuffer(buffer) {
-    const oBackData = this.getPeaks(
-      buffer, this.state.iPerSecPx,
+    const buffer = await this.fileToBuffer(audioFile);
+    this.setState({loading: false});
+    // ▼返回内容有：fPerSecPx, aPeaks, duration
+    const oBackData = this.getPeaks( 
+      buffer, this.state.iPerSecPx, 0,
+      this.oWaveWrap.current.offsetWidth,
     );
     this.toDraw(oBackData.aPeaks);
-    this.setState({buffer, ...oBackData});
-    // oBackData = fPerSecPx, aPeaks, duration
-  }
-  fileToBuffer(oFile) {
-    const reader = new FileReader();
-    let resolveFn = xx => xx;
-    const promise = new Promise(resolve => resolveFn = resolve);
-    let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    reader.onload = async (evt) => {
-      const arrayBuffer = evt.currentTarget.result;
-      const buffer = await audioContext.decodeAudioData(arrayBuffer);
-      audioContext = null; // 如果不销毁audioContext对象的话，audio标签是无法播放的
-      resolveFn(buffer);
-    }
-    reader.readAsArrayBuffer(oFile);
-    return promise;
-  }
-  toExport() {
-    const { aTimeLine } = this.state;
-    const aStr = aTimeLine.map(({ start_, end_, text }, idx) => {
-      return `${idx + 1}\n${start_} --> ${end_}\n${text}\n`;
+    let aTimeLine = await window.lf.getItem(fileName);
+    aTimeLine = aTimeLine || [this.state.oFirstLine];
+    this.setState({
+      fileName, fileSrc, buffer,
+      aTimeLine, ...oBackData,
     });
-    const blob = new Blob([aStr.join('\n')]);
-    Object.assign(document.createElement('a'), {
-      download: `字幕文件-${new Date() * 1}.srt`,
-      href: URL.createObjectURL(blob),
-    }).click();
   }
+  // buffer.sampleRate  // 采样率：浮点数，单位为 sample/s
+  // buffer.length  // 采样帧率：整形
+  // buffer.duration  // 时长：双精度型（单位为秒）
+  // buffer.numberOfChannels  // 通道数：整形
   // ▼计算波峰、波谷
   getPeaks(buffer, iPerSecPx, left=0, iCanvasWidth=500) {
-    // buffer.sampleRate  // 采样率：浮点数，单位为 sample/s
-    // buffer.length  // 采样帧率：整形
-    // buffer.duration  // 时长：双精度型（单位为秒）
-    // buffer.numberOfChannels  // 通道数：整形
     const oChannel = buffer.getChannelData(0);
     const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
     const aPeaks = [];
@@ -99,5 +81,32 @@ export default class {
       aPeaks: aPeaks.slice(left*2),
       duration: buffer.duration,
     };
+  }
+  // ▼从文件得到 buffer 数据
+  fileToBuffer(oFile) {
+    const reader = new FileReader();
+    let resolveFn = xx => xx;
+    const promise = new Promise(resolve => resolveFn = resolve);
+    reader.onload = async (evt) => {
+      const arrayBuffer = evt.currentTarget.result;
+      let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const buffer = await audioContext.decodeAudioData(arrayBuffer);
+      resolveFn(buffer);
+      audioContext = null; // 如果不销毁audioContext对象的话，audio标签是无法播放的
+    };
+    reader.readAsArrayBuffer(oFile);
+    return promise;
+  }
+  // ▼导出文件
+  toExport() {
+    const { aTimeLine } = this.state;
+    const aStr = aTimeLine.map(({ start_, end_, text }, idx) => {
+      return `${idx + 1}\n${start_} --> ${end_}\n${text}\n`;
+    });
+    const blob = new Blob([aStr.join('\n')]);
+    Object.assign(document.createElement('a'), {
+      download: `字幕文件-${new Date() * 1}.srt`,
+      href: URL.createObjectURL(blob),
+    }).click();
   }
 };

@@ -1,4 +1,7 @@
+import { message } from 'antd';
+
 export default class {
+  message = message;
   // ▼输入框文字改变
   valChanged(ev) {
     const text = ev.target.value;
@@ -35,22 +38,27 @@ export default class {
     oSententList.scrollTo(0, fHeight);
     this.setState({iCurLine: idx});
   }
-  // ▼绘制
-  toDraw(aPeaks_) {
-    const { iHeight } = this.state;
-    const aPeaks = aPeaks_ || this.state.aPeaks;
-    const oWaveWrap = this.oWaveWrap.current;
+  // ▼清空画布
+  cleanCanvas(){
+    const width = this.oWaveWrap.current.offsetWidth;
     const oCanvas = this.oCanvas.current;
     const Context = oCanvas.getContext('2d');
-    const { height } = oCanvas;
-    const width = oWaveWrap.offsetWidth;
-    const halfHeight = height / 2;
     oCanvas.width = width;
     Context.fillStyle = 'black';
-    Context.fillRect(0, 0, width, height);
+    Context.fillRect(0, 0, width, oCanvas.height);
+  }
+  // ▼绘制
+  toDraw(aPeaks_) {
+    if (!aPeaks_) alert('绘制，但没收到波形');
+    this.cleanCanvas();
+    const {iHeight} = this.state; //波形高
+    const aPeaks = aPeaks_ || this.state.aPeaks;
+    const oCanvas = this.oCanvas.current;
+    const Context = oCanvas.getContext('2d');
+    const {height} = oCanvas;
+    const halfHeight = height / 2;
     let idx = -1;
     const fCanvasWidth = aPeaks.length / 2;
-    // debugger;
     while (idx < fCanvasWidth) {
       idx++;
       const cur1 = aPeaks[idx * 2] * iHeight;
