@@ -37,7 +37,7 @@ export function getTimeLine(text, getArr) {
   });
   return strArr.map((cur, idx) => {
     const [aa, bb] = cur.split(' --> ');
-    const [start, end] = [getSeconds(aa), getSeconds(bb)];
+    const [start, end] = [this.getSeconds(aa), this.getSeconds(bb)];
     return {
       start_: aa,
       end_: bb,

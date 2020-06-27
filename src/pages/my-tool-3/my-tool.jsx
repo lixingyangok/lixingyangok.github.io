@@ -1,11 +1,12 @@
 import React from "react";
 import * as cpnt from "./style/my-tool-style.js";
-// import * as fn from "./js/my-tool-pure-fn.js";
+import * as fn from "./js/my-tool-pure-fn.js";
 import {Button} from "antd";
 import coreFn from "./js/core-fn.js";
 import keyDownFn from "./js/key-down-fn.js";
 import MouseFn from './js/mouse-fn.js';
 import fileFn from './js/file-fn.js';
+
 
 export default class Tool extends window.mix(
   React.Component,
@@ -49,14 +50,8 @@ export default class Tool extends window.mix(
   }
   render() {
     const {
-      buffer,
-      aTimeLine,
-      iCurLine,
-      iCanvasHeight,
-      duration,
-      iPerSecPx,
-      fileSrc,
-      // fPerSecPx,
+      buffer, aTimeLine, iCurLine, iCanvasHeight,
+      duration, iPerSecPx, fileSrc, // fPerSecPx,
     } = this.state;
     const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
     const fPerSecPx = buffer.length / sampleSize / duration;
@@ -148,12 +143,26 @@ export default class Tool extends window.mix(
     document.addEventListener("dragleave", pushFiles);	// ▼拖动离开（未必会执行
     document.addEventListener("dragenter", pushFiles);	// ▼拖动进入
     document.addEventListener("dragover", pushFiles);	// ▼拖动进行中
-    // ▼加载
-    // const buffer = await fn.getMp3();
-    // const sText = await fn.getText();
-    // const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
-    // this.setState({buffer, aTimeLine});
-    // this.bufferToPeaks();
-    // this.toDraw();
+  }
+  // ▼测试
+  async testFn(){
+    const buffer = await fn.getMp3();
+    const sText = await fn.getText();
+    const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
+    this.setState({buffer, aTimeLine});
+    this.bufferToPeaks();
+    this.toDraw();
+  }
+  // ▼音频数据转换波峰数据
+  bufferToPeaks(perSecPx_, leftPoint = 0) {
+    const oWaveWrap = this.oWaveWrap.current;
+    const { offsetWidth, scrollLeft } = oWaveWrap;
+    const { buffer, iPerSecPx } = this.state;
+    const obackData = this.getPeaks(
+      buffer, (perSecPx_ || iPerSecPx), scrollLeft, offsetWidth,
+    );
+    // ▲返回内容：{aPeaks, fPerSecPx, duration};
+    this.setState({ ...obackData });
+    return obackData.aPeaks;
   }
 }

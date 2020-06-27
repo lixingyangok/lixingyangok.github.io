@@ -35,30 +35,13 @@ export default class {
     aTimeLine = aTimeLine || [this.state.oFirstLine];
     this.setState({aTimeLine});
   }
-  // ▼音频数据转换波峰数据
-  bufferToPeaks(perSecPx_, leftPoint = 0) {
-    const oWaveWrap = this.oWaveWrap.current;
-    const { offsetWidth, scrollLeft } = oWaveWrap;
-    const { buffer, iPerSecPx } = this.state;
-    const obackData = this.getPeaks(
-      buffer, (perSecPx_ || iPerSecPx), scrollLeft, offsetWidth,
-    );
-    // ▲返回内容：{aPeaks, fPerSecPx, duration};
-    this.setState({ ...obackData });
-    return obackData.aPeaks;
-  }
   showWaveByBuffer(buffer) {
-    const aWave = this.getPeaks(buffer, 50);
-    const fCanvasWidth = aWave.length / 2; // 画布宽度
-    this.setState({
-      buffer,
-      aWave,
-      fCanvasWidth,
-      duration: buffer.duration,
-      fPerSecPx: fCanvasWidth / buffer.duration,
-    });
-    this.toDraw();
-    // this.watchKeyDown();
+    const oBackData = this.getPeaks(
+      buffer, this.state.iPerSecPx,
+    );
+    this.toDraw(oBackData.aPeaks);
+    this.setState({buffer, ...oBackData});
+    // oBackData = fPerSecPx, aPeaks, duration
   }
   fileToBuffer(oFile) {
     const reader = new FileReader();

@@ -16,7 +16,7 @@ export const WaveWrap = styled.div`
   overflow-y: hidden;
   position: relative;
   flex: none;
-  canvas{}
+  canvas{ }
   .region{
     box-sizing: border-box;
     position: absolute;

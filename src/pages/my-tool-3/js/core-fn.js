@@ -49,7 +49,8 @@ export default class {
     Context.fillStyle = 'black';
     Context.fillRect(0, 0, width, height);
     let idx = -1;
-    let fCanvasWidth = aPeaks.length / 2;
+    const fCanvasWidth = aPeaks.length / 2;
+    // debugger;
     while (idx < fCanvasWidth) {
       idx++;
       const cur1 = aPeaks[idx * 2] * iHeight;
