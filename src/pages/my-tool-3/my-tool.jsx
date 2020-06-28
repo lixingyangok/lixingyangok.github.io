@@ -150,7 +150,7 @@ export default class Tool extends window.mix(
   async testFn(){
     const buffer = await fn.getMp3();
     const sText = await fn.getText();
-    const aTimeLine = fn.getTimeLine(sText).slice(0); //字幕
+    const aTimeLine = this.getTimeLine(sText).slice(0); //字幕
     this.setState({buffer, aTimeLine});
     this.bufferToPeaks();
     this.toDraw();

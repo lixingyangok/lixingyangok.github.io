@@ -21,16 +21,15 @@ export default class {
   // ▼过滤出正确的文件
   async getCorrectFile(oFiles){
     const aFiles = [...oFiles];
-    console.log(aFiles);
     const audioFile = aFiles.find(cur => {
       const aArr = ["audio/mpeg"];
       return aArr.includes(cur.type);
     });
-    if (!audioFile) return this.message.error('不支持此文件');
-    this.getFileToDraw(audioFile);
     const srtFile = aFiles.find(cur => {
       return cur.name.split('.').pop() === 'srt';
     });
+    audioFile && this.getFileToDraw(audioFile);
+    srtFile && this.getSubtitleToSave(srtFile);
   }
   // ▼绘制波形
   async getFileToDraw(audioFile){
@@ -112,8 +111,26 @@ export default class {
       href: URL.createObjectURL(blob),
     }).click();
   }
+  // ▼以上是字幕部分 ===================================================
+  // ▼文件转字符，然后保存
+  async getSubtitleToSave(oFile){
+    const sText = await this.fileToStrings(oFile);
+    const aTimeLine = this.getTimeLine(sText); //字幕
+    this.setState({aTimeLine});
+    // console.log(sText);
+  }
+  // ▼文件转字符
+  fileToStrings(oFile){
+    let resolveFn = xx => xx;
+    const oPromise = new Promise(resolve => resolveFn = resolve);
+    const reader = Object.assign(new FileReader(), {
+      onload: event => resolveFn(event.target.result), // event.target.result就是文件文本内容,
+    });
+    reader.readAsText(oFile);
+    return oPromise;
+  }
   // ▼处理字幕文件
-  getTimeLine(text, getArr) {
+  getTimeLine(text) {
     let strArr = text.split('\n');
     const aLine = [];
     strArr = strArr.filter((cur, idx) => {
