@@ -44,11 +44,11 @@ export default class Tool extends window.mix(
       fileSrc: "", //文件地址
       fileSrcFull: "",
       iHeight: 50, // 波形高
-      iCanvasHeight: 150,
+      iCanvasHeight: 150, //画布高
       iPerSecPx: 55, //人为定义的每秒像素数
       fPerSecPx: 0, //实际每秒像素数
       drawing: false, //是否在绘制中（用于防抖
-      loading: false, //
+      loading: false, //是否在加载中（解析文件
     };
   }
   render() {
@@ -61,48 +61,53 @@ export default class Tool extends window.mix(
     return (
       <cpnt.Div>
         <Spin spinning={this.state.loading} size="large"></Spin>
-        {/* <audio src={`./static/${fn.fileName}.mp3`} ref={this.oAudio} /> */}
-        <audio src={fileSrc} ref={this.oAudio}/>
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={() => this.onScrollFn()}
-          style={{height: `${iCanvasHeight + 20}px`}}
+          style={{height: `${iCanvasHeight + 15}px`}}
         >
-          <cpnt.TimeBar style={{width: `${fPerSecPx * duration}px`}} 
+          <canvas height={iCanvasHeight} ref={this.oCanvas} />
+          <audio src={fileSrc} ref={this.oAudio}/>
+          <cpnt.TimeBar style={{width: `${fPerSecPx * duration}px`}}
             onContextMenu={ev => this.clickOnWave(ev)}
             onMouseDown={ev=>this.mouseDownFn(ev)}
           >
             <i className="pointer" ref={this.oPointer}/>
-            <section>
+            <cpnt.MarkWrap className="mark-wrap" >
+              {[...Array(~~duration).keys()].map((cur, idx) => {
+                return <span className="second-mark" key={cur}
+                  style={{width: fPerSecPx + "px", left: idx*fPerSecPx + "px"}}
+                >
+                  {/* {cur+1} */}
+                </span>;
+              })}
+            </cpnt.MarkWrap>
+            <cpnt.RegionWrap>
               {aTimeLine.map(({ start, end }, idx) => {
-                return <cpnt.Region key={idx}
+                return <span key={idx}
                   className={idx === iCurLine ? "cur region" : "region"}
                   style={{left: `${start * fPerSecPx}px`, width: `${(end - start) * fPerSecPx}px`}}
                 >
-                  {idx + 1}
-                </cpnt.Region>
+                  <span className="idx" >{idx + 1}</span>
+                </span>
               })}
-            </section>
-            {/* ▼刻度（秒）*/}
-            <section>
-              {[...Array(~~duration).keys()].map((cur, idx) => {
-                return <span className="second-mark" key={cur}
-                  style={{ width: fPerSecPx + "px", left: idx*fPerSecPx + "px" }}
-                >
-                  {cur}
-                </span>;
-              })}
-            </section>
+            </cpnt.RegionWrap>
           </cpnt.TimeBar>
-          <canvas height={iCanvasHeight} ref={this.oCanvas} />
         </cpnt.WaveWrap>
+        {/* 上下分界 */}
         <cpnt.BtnBar>
           <div>
             <Button type="primary" onClick={() => this.toSave()}>
-              保存
-            </Button>
-            &nbsp;
-            <Button onClick={() => this.toExport()}>导出</Button>&nbsp;
-            <input type="file" onChange={ev => this.toImport(ev)} multiple="multiple"/>
+              保存到IndexedDB
+            </Button>&nbsp;
+            <Button onClick={() => this.toExport()}>
+              导出.srt文件
+            </Button>&nbsp;
+            <label className="ant-btn" >
+              导入文件
+              <input style={{display: 'none'}} type="file" multiple="multiple"
+                onChange={ev => this.toImport(ev)}
+              />
+            </label>
           </div>
         </cpnt.BtnBar>
         {/* 分界 */}

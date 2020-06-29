@@ -5,16 +5,16 @@ export default class {
     const fnLib = {
       '`': () => this.toPlay(null, true),
       'Tab': () => this.toPlay(),
-      'Delete': () => this.toDel(),
+      'Prior': () => this.previousAndNext(-1),
+      'Next': () => this.previousAndNext(1),
       'F1': ()=>this.cutHere('start'),
       'F2': ()=>this.cutHere('end'),
-      // 到此为止
       // 一万两段
       // 合并上一句
       // 合并下一句
-
       // ctrl 系列
       'ctrl + Enter': () => this.toPlay(), //播放
+      'ctrl + Delete': () => this.toDel(),
       'ctrl + d': () => this.toDel(), //删除
       'ctrl + s': () => this.toSave(), //保存
       // alt 系列
