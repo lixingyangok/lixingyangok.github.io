@@ -5,9 +5,10 @@
  */ 
 
 export const fileName = '伊索寓言';
+export const mp3Src  = `./static/${fileName}.mp3`;
 
 export async function getMp3() {
-  const res = await fetch(`./static/${fileName}.mp3`);
+  const res = await fetch(mp3Src);
   console.log('音频文件', res);
   // console.log('音频返回', res);
   const arrayBuffer = await res.arrayBuffer();

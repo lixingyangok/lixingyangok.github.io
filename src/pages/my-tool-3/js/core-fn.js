@@ -1,14 +1,14 @@
-import { message } from 'antd';
+import {message} from 'antd';
 
 export default class {
   message = message;
   // ▼输入框文字改变
   valChanged(ev) {
     const text = ev.target.value;
-    if (!text[0] || !text[text.length - 1]) return;
-    const { iCurLine, aTimeLine } = this.state;
+    // if (/^\s+.+/.test(text)) return; //禁止空格开头 
+    const {iCurLine, aTimeLine} = this.state;
     aTimeLine[iCurLine].text = text;
-    this.setState({ aTimeLine });
+    this.setState({aTimeLine});
   }
   // ▼跳至某行
   async goLine(idx) {
@@ -49,7 +49,7 @@ export default class {
   }
   // ▼绘制
   toDraw(aPeaks_) {
-    if (!aPeaks_) alert('绘制，但没收到波形');
+    // aPeaks_ 修改波形高度的时候没有这个参数
     this.cleanCanvas();
     const {iHeight} = this.state; //波形高
     const aPeaks = aPeaks_ || this.state.aPeaks;
@@ -111,19 +111,19 @@ export default class {
     const iNowSec = iLeftPx / fPerSecPx; //当前指向时间（秒）
     return iNowSec;
   }
-  // ▼设定时间
-  setTime(key, val){
+  // ▼设定时间。1参是类型，2参是秒数
+  setTime(sKey, fVal){
     const {aTimeLine, iCurLine} = this.state;
     const oCurLine = aTimeLine[iCurLine];
     const {start, end} = oCurLine;
-    if (key === 'start' && val > end) {
+    if (sKey === 'start' && fVal > end) {
       oCurLine.start = end;
-      oCurLine.end = val;
-    } else if (key==='end' && val < start){
-      oCurLine.start = val;
+      oCurLine.end = fVal;
+    } else if (sKey==='end' && fVal < start){
+      oCurLine.start = fVal;
       oCurLine.end = start;
     } else {
-      oCurLine[key] = val;
+      oCurLine[sKey] = fVal;
     }
     oCurLine.start_ = this.secToStr(oCurLine.start);
     oCurLine.end_ = this.secToStr(oCurLine.end);

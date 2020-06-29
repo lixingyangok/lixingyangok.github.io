@@ -22,12 +22,14 @@ export default class Tool extends window.mix(
   oSententList = React.createRef();
   constructor(props) {
     super(props);
+    const start = 0.1;
+    const end = 5;
     const oFirstLine = {
-      start_: "00:00:01,000",
-      end_: "00:00:05,000",
-      start: 1,
-      end: 5,
-      long: 4,
+      start_: this.secToStr(start),
+      end_: this.secToStr(end),
+      start,
+      end,
+      long: end - start,
       text: "",
     };
     this.state = {
@@ -40,13 +42,13 @@ export default class Tool extends window.mix(
       aTimeLine: [oFirstLine], //字幕
       fileName: "", //文件名
       fileSrc: "", //文件地址
+      fileSrcFull: "",
       iHeight: 50, // 波形高
       iCanvasHeight: 150,
       iPerSecPx: 55, //人为定义的每秒像素数
       fPerSecPx: 0, //实际每秒像素数
       drawing: false, //是否在绘制中（用于防抖
       loading: false, //
-      mouseDraggingFn: ()=>0,
     };
   }
   render() {
@@ -145,13 +147,15 @@ export default class Tool extends window.mix(
     document.addEventListener("dragleave", pushFiles);	// ▼拖动离开（未必会执行
     document.addEventListener("dragenter", pushFiles);	// ▼拖动进入
     document.addEventListener("dragover", pushFiles);	// ▼拖动进行中
+    this.testFn();
   }
   // ▼测试
   async testFn(){
+
     const buffer = await fn.getMp3();
     const sText = await fn.getText();
-    const aTimeLine = this.getTimeLine(sText).slice(0); //字幕
-    this.setState({buffer, aTimeLine});
+    const aTimeLine = this.getTimeLine(sText).slice(0, 3); //字幕
+    this.setState({buffer, aTimeLine, fileSrc: fn.mp3Src});
     this.bufferToPeaks();
     this.toDraw();
   }

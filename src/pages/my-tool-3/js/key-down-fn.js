@@ -5,22 +5,30 @@ export default class {
     const fnLib = {
       '`': () => this.toPlay(null, true),
       'Tab': () => this.toPlay(),
+      'Delete': () => this.toDel(),
+      'F1': ()=>this.cutHere('start'),
+      'F2': ()=>this.cutHere('end'),
+      // 到此为止
+      // 一万两段
+      // 合并上一句
+      // 合并下一句
+
       // ctrl 系列
-      'ctrl + Enter': () => this.toPlay(),
-      'ctrl + d': () => this.toDel(),
-      'ctrl + s': () => this.toSave(),
+      'ctrl + Enter': () => this.toPlay(), //播放
+      'ctrl + d': () => this.toDel(), //删除
+      'ctrl + s': () => this.toSave(), //保存
       // alt 系列
       'alt + j': () => this.previousAndNext(-1),
       'alt + k': () => this.previousAndNext(1),
       'alt + ,': () => this.changeWaveHeigh(-1),
       'alt + .': () => this.changeWaveHeigh(1),
-      'alt + u': () => this.fixRegion('start', -0.35),
-      'alt + i': () => this.fixRegion('start', 0.35),
+      'alt + u': () => this.fixRegion('start', -0.1),
+      'alt + i': () => this.fixRegion('start', 0.1),
       // ▼ 其它，用于微调
-      'shift + alt + u': () => this.fixRegion('start', -0.1),
-      'shift + alt + i': () => this.fixRegion('start', 0.1),
-      'shift + alt + j': () => this.fixRegion('end', -0.1),
-      'shift + alt + k': () => this.fixRegion('end', 0.1),
+      // 'shift + alt + u': () => this.fixRegion('start', -0.1),
+      // 'shift + alt + i': () => this.fixRegion('start', 0.1),
+      // 'shift + alt + j': () => this.fixRegion('end', -0.1),
+      // 'shift + alt + k': () => this.fixRegion('end', 0.1),
     }
     const fn = fnLib[keyStr];
     if (!fn) return false;
@@ -75,12 +83,12 @@ export default class {
   }
   // ▼删除某条
   toDel() {
-    const { aTimeLine, iCurLine } = this.state;
+    const {aTimeLine, iCurLine} = this.state;
     this.setState({
       aTimeLine: aTimeLine.filter((cur, idx) => idx !== iCurLine),
     });
   }
-  // ▼保存字幕到本地
+  // ▼保存字幕到浏览器
   async toSave() {
     const {aTimeLine, fileName} = this.state;
     if (!fileName) return;
@@ -102,6 +110,11 @@ export default class {
       fNewVal = next.start - 0.05;
     }
     this.setTime(sKey, fNewVal);
+  }
+  cutHere(sKey){
+    const oAudio = this.oAudio.current;
+    console.log(sKey, oAudio.currentTime);
+    this.setTime(sKey, oAudio.currentTime);
   }
 }
 

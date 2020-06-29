@@ -8,6 +8,11 @@ export default class {
   // ▼拖入文件
   pushFiles(ev) {
     ev.preventDefault();
+    ev.stopPropagation();
+    console.clear();
+    console.log(ev);
+    console.log(ev.dataTransfer);
+    console.log(ev.dataTransfer.files);
     if (ev.type !== 'drop') return;
     this.getCorrectFile(ev.dataTransfer.files);
   }
@@ -16,6 +21,7 @@ export default class {
     const {target} = ev;
     if (!target.files.length) return;
     this.getCorrectFile(target.files);
+    console.log(target.value);
     target.value = '';
   }
   // ▼过滤出正确的文件
@@ -25,14 +31,14 @@ export default class {
       const aArr = ["audio/mpeg"];
       return aArr.includes(cur.type);
     });
-    const srtFile = aFiles.find(cur => {
-      return cur.name.split('.').pop() === 'srt';
-    });
     audioFile && this.getFileToDraw(audioFile);
-    srtFile && this.getSubtitleToSave(srtFile);
+    // ▲音频，▼字幕
+    const srtFile = aFiles.find(cur => cur.name.split('.').pop() === 'srt');
+    this.getSubtitleToSave(srtFile, audioFile);
   }
   // ▼绘制波形
   async getFileToDraw(audioFile){
+    console.log('文件', audioFile);
     this.cleanCanvas();
     this.setState({loading: true});
     const fileName = audioFile.name;
@@ -45,12 +51,7 @@ export default class {
       this.oWaveWrap.current.offsetWidth,
     );
     this.toDraw(oBackData.aPeaks);
-    let aTimeLine = await window.lf.getItem(fileName);
-    aTimeLine = aTimeLine || [this.state.oFirstLine];
-    this.setState({
-      fileName, fileSrc, buffer,
-      aTimeLine, ...oBackData,
-    });
+    this.setState({fileName, fileSrc, buffer, ...oBackData});
   }
   // buffer.sampleRate  // 采样率：浮点数，单位为 sample/s
   // buffer.length  // 采样帧率：整形
@@ -89,7 +90,7 @@ export default class {
     const reader = new FileReader();
     let resolveFn = xx => xx;
     const promise = new Promise(resolve => resolveFn = resolve);
-    reader.onload = async (evt) => {
+    reader.onload = async evt => {
       const arrayBuffer = evt.currentTarget.result;
       let audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const buffer = await audioContext.decodeAudioData(arrayBuffer);
@@ -113,11 +114,16 @@ export default class {
   }
   // ▼以上是字幕部分 ===================================================
   // ▼文件转字符，然后保存
-  async getSubtitleToSave(oFile){
-    const sText = await this.fileToStrings(oFile);
-    const aTimeLine = this.getTimeLine(sText); //字幕
+  async getSubtitleToSave(oFile, oAudioFile){
+    let aTimeLine;
+    if (oFile){
+      const sText = await this.fileToStrings(oFile);
+      aTimeLine = this.getTimeLine(sText); //字幕
+    }else if(oAudioFile){
+      aTimeLine = await window.lf.getItem(oAudioFile.name);
+      aTimeLine = aTimeLine || [this.state.oFirstLine];
+    }
     this.setState({aTimeLine});
-    // console.log(sText);
   }
   // ▼文件转字符
   fileToStrings(oFile){
@@ -129,7 +135,7 @@ export default class {
     reader.readAsText(oFile);
     return oPromise;
   }
-  // ▼处理字幕文件
+  // ▼字符转字幕数据，用于显示
   getTimeLine(text) {
     let strArr = text.split('\n');
     const aLine = [];
