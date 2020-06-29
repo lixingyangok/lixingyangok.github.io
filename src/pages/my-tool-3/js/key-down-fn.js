@@ -10,13 +10,14 @@ export default class {
       'F1': ()=>this.cutHere('start'),
       'F2': ()=>this.cutHere('end'),
       // 一万两段
-      // 合并上一句
-      // 合并下一句
       // ctrl 系列
       'ctrl + Enter': () => this.toPlay(), //播放
-      'ctrl + Delete': () => this.toDel(),
+      'ctrl + Delete': () => this.toDel(), //删除
       'ctrl + d': () => this.toDel(), //删除
-      'ctrl + s': () => this.toSave(), //保存
+      'ctrl + Up': () => this.putTogether('prior'), // 合并上一句
+      'ctrl + Down': () => this.putTogether('next'), // 合并下一句
+      'ctrl + z': () => this.getHistory(-1), //撤销
+      'ctrl + shift + z': () => this.getHistory(1), //恢复
       // alt 系列
       'alt + j': () => this.previousAndNext(-1),
       'alt + k': () => this.previousAndNext(1),
@@ -24,11 +25,6 @@ export default class {
       'alt + .': () => this.changeWaveHeigh(1),
       'alt + u': () => this.fixRegion('start', -0.1),
       'alt + i': () => this.fixRegion('start', 0.1),
-      // ▼ 其它，用于微调
-      // 'shift + alt + u': () => this.fixRegion('start', -0.1),
-      // 'shift + alt + i': () => this.fixRegion('start', 0.1),
-      // 'shift + alt + j': () => this.fixRegion('end', -0.1),
-      // 'shift + alt + k': () => this.fixRegion('end', 0.1),
     }
     const fn = fnLib[keyStr];
     if (!fn) return false;
@@ -42,7 +38,7 @@ export default class {
     const alt = altKey ? 'alt + ' : '';
     const keyStr = ctrl + shift + alt + keyMap[keyCode];
     const theFn = this.getFn(keyStr);
-    console.log('按下：', keyCode);
+    console.log('按下了：', keyCode);
     if (!theFn) return;
     theFn();
     ev.preventDefault();
@@ -55,16 +51,10 @@ export default class {
     if (iCurLineNew < 0) iCurLineNew = 0;
     if (iCurLineNew > aTimeLine.length - 1) {
       const oLast = aTimeLine.slice(-1)[0];
-      const start = oLast.end + 0.05;
-      const end = oLast.end + 10.05;
-      const oNewItem = {
-        start,
-        end,
-        long: end - start,
-        text: '',
-        start_: this.secToStr(start),
-        end_: this.secToStr(end),
-      };
+      const oNewItem = this.fixTime({
+        start: oLast.end + 0.05,
+        end: oLast.end + 10.05,
+      });
       this.setState({
         aTimeLine: [...aTimeLine, oNewItem],
       });
@@ -111,10 +101,50 @@ export default class {
     }
     this.setTime(sKey, fNewVal);
   }
+  // ▼重新定位起点，终点
   cutHere(sKey){
     const oAudio = this.oAudio.current;
     console.log(sKey, oAudio.currentTime);
     this.setTime(sKey, oAudio.currentTime);
+  }
+  // ▼合并
+  putTogether(sType){
+    let {aTimeLine, iCurLine} = this.state;
+    const oTarget = ({
+      prior: aTimeLine[iCurLine - 1],
+      next: aTimeLine[iCurLine + 1],
+    }[sType]);
+    if (!oTarget) return;
+    const oCur = aTimeLine[iCurLine];
+    oTarget.start = Math.min(oTarget.start, oCur.start);
+    oTarget.end = Math.max(oTarget.end, oCur.end);
+    oTarget.text = (()=>{ 
+      let sResult = oTarget.text + ' ' + oCur.text;
+      if (sType === 'next') sResult = oCur.text + ' ' + oTarget.text;
+      return sResult.replace(/\s+/g, ' ');
+    })();
+    this.fixTime(oTarget);
+    aTimeLine.splice(iCurLine, 1);
+    if (sType === 'prior') iCurLine--;
+    this.setState({aTimeLine, iCurLine});
+  }
+  getHistory(iType){
+    const {aHistory, aHistory:{length: len}} = this.state;
+    console.log('历史方向', iType);
+    console.log(JSON.parse(
+      JSON.stringify(aHistory)
+    ));
+    if (!len) return;
+    const oLast = (()=>{
+      if (len>1) {
+        aHistory.pop();
+        return aHistory.slice(-1)[0];
+      }
+      return aHistory.pop();
+    })();
+    // console.log('历史', oLast.aTimeLine[0]);
+    // console.log('历史', oLast.aTimeLine[0].start);
+    this.setState({...oLast, aHistory});
   }
 }
 

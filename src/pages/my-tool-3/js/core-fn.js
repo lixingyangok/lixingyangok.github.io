@@ -125,11 +125,25 @@ export default class {
     } else {
       oCurLine[sKey] = fVal;
     }
-    oCurLine.start_ = this.secToStr(oCurLine.start);
-    oCurLine.end_ = this.secToStr(oCurLine.end);
-    oCurLine.long = oCurLine.end - oCurLine.start;
+    this.fixTime(oCurLine);
     aTimeLine[iCurLine] = oCurLine;
     this.setState({aTimeLine});
+    this.saveHistory(aTimeLine, iCurLine);
+  }
+  saveHistory(aTimeLine, iCurLine){
+    let {aHistory} = this.state;
+    aHistory.push({iCurLine, aTimeLine});
+    if (aHistory.length > 100) aHistory.shift();
+    aHistory = JSON.parse(JSON.stringify(aHistory));
+    this.setState({aHistory});
+  }
+  fixTime(oTarget){
+    const {start, end, text=''} = oTarget;
+    oTarget.start_ = this.secToStr(start);
+    oTarget.end_ = this.secToStr(end);
+    oTarget.long = end - start;
+    oTarget.text = text;
+    return oTarget;
   }
   // ▼时间轴的时间转秒
   getSeconds(text) {

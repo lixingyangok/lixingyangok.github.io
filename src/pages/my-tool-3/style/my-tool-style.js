@@ -72,12 +72,14 @@ export const MarkWrap = styled.section`
     box-sizing: border-box;
     display: inline-block;
     border-left: solid 1px rgba(255,255,255,0.5);
-    height: 50%;
+    height: 80%;
     z-index: 3;
     position: absolute;
     bottom: 0;
     color: white;
     font-size: 12px;
+    line-height: 1;
+    padding: 0 0 2px 2px;
   }
 `;
 
@@ -98,7 +100,7 @@ export const RegionWrap = styled.section`
     z-index: 4;
     margin: 0;
     padding: 0;
-    border: solid rgba(255,255,255,0.5);
+    border: solid rgba(255,255,255,0.6);
     border-width: 0 1px;
     overflow: hidden;
   }
@@ -106,17 +108,16 @@ export const RegionWrap = styled.section`
     border-color: transparent blue transparent red;
     border-width: 0 2px;
     background: none;
-    box-shadow: 0px 0 0px 1000px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0 0px ${1000 * 100}px rgba(0, 0, 0, 0.3);
   }
   .idx{
     position: absolute;
-    left: 1px;
-    bottom: 3px;
+    left: 5px;
+    bottom: 1px;
     font-size: 12px;
+    color: white;
   }
 `;
-
-
 
 export const BtnBar = styled.div`
   display: flex;
@@ -136,6 +137,7 @@ export const InputWrap = styled.div`
     padding: 5px 10px;
     font-size: 20px;
     font-weight: bold;
+    resize: none;
   }
 `;
 

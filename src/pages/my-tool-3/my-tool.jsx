@@ -22,16 +22,10 @@ export default class Tool extends window.mix(
   oSententList = React.createRef();
   constructor(props) {
     super(props);
-    const start = 0.1;
-    const end = 5;
-    const oFirstLine = {
-      start_: this.secToStr(start),
-      end_: this.secToStr(end),
-      start,
-      end,
-      long: end - start,
-      text: "",
-    };
+    const oFirstLine = this.fixTime({
+      start: 0.1, end: 5,
+      start_: '', end_: '', long: 0, text: "",
+    });
     this.state = {
       buffer: {}, //音频数据
       aPeaks: [], //波形数据
@@ -49,11 +43,13 @@ export default class Tool extends window.mix(
       fPerSecPx: 0, //实际每秒像素数
       drawing: false, //是否在绘制中（用于防抖
       loading: false, //是否在加载中（解析文件
+      aHistory: [],
+      iCurHst: 0,
     };
   }
   render() {
     const {
-      buffer, aTimeLine, iCurLine, iCanvasHeight,
+      buffer, aTimeLine, iCurLine, iCanvasHeight, aHistory,
       duration, iPerSecPx, fileSrc, // fPerSecPx,
     } = this.state;
     const sampleSize = ~~(buffer.sampleRate / iPerSecPx); // 每一份的点数 = 每秒采样率 / 每秒像素
@@ -77,7 +73,7 @@ export default class Tool extends window.mix(
                 return <span className="second-mark" key={cur}
                   style={{width: fPerSecPx + "px", left: idx*fPerSecPx + "px"}}
                 >
-                  {/* {cur+1} */}
+                  {cur}
                 </span>;
               })}
             </cpnt.MarkWrap>
@@ -110,6 +106,13 @@ export default class Tool extends window.mix(
             </label>
           </div>
         </cpnt.BtnBar>
+        <ul>
+          {aHistory.map((cur,idx)=>{
+            return <li key={idx} style={{display: 'inline-block'}} >
+              {idx}--&emsp;
+            </li>;
+          })}
+        </ul>
         {/* 分界 */}
         <cpnt.InputWrap>
           {(() => {
@@ -154,12 +157,18 @@ export default class Tool extends window.mix(
     document.addEventListener("dragover", pushFiles);	// ▼拖动进行中
     this.testFn();
   }
+  // componentWillUpdate(nextProps, nextState) {
+  //   const {aTimeLineOld} = this.state;
+  //   const {aTimeLineNew} = nextState;
+  //   if (aTimeLineOld==aTimeLineNew) return;
+    
+  //   console.log('componentWillUpdate', aTimeLineOld==aTimeLineNew);
+  // }
   // ▼测试
   async testFn(){
-
     const buffer = await fn.getMp3();
     const sText = await fn.getText();
-    const aTimeLine = this.getTimeLine(sText).slice(0, 3); //字幕
+    const aTimeLine = this.getTimeLine(sText).slice(0, 13); //字幕
     this.setState({buffer, aTimeLine, fileSrc: fn.mp3Src});
     this.bufferToPeaks();
     this.toDraw();
