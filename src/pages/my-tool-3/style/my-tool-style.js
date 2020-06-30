@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+export const iScrollHeight = 15;
+
 export const Div = styled.div`
   box-sizing: border-box;
   padding: 20px 40px 60px;
@@ -31,22 +33,13 @@ export const WaveWrap = styled.div`
   overflow-y: hidden;
   position: relative;
   flex: none;
-  .pointer{
-    position: absolute;
-    width: 1px;
-    height: 100%;
-    background: white;
-    top: 0;
-    left: 0;
-    z-index: 9;
-  }
   canvas{
     position: absolute;
     top: 0;
     left: 0;
   }
   ::-webkit-scrollbar{
-    height: 15px;
+    height: ${iScrollHeight}px;
     background: #000;
   }
   ::-webkit-scrollbar-thumb{
@@ -116,6 +109,15 @@ export const RegionWrap = styled.section`
     bottom: 1px;
     font-size: 12px;
     color: white;
+  }
+  .pointer{
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background: white;
+    top: 0;
+    left: 0;
+    z-index: 9;
   }
 `;
 

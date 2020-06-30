@@ -93,7 +93,7 @@ export default class {
       const step = long * fPerSecPx / (long * iSecFrequency);
       const newLeft = Number.parseFloat(style.left) + step;
       const fEndPx = end * fPerSecPx;
-      if (newLeft >= fEndPx || Audio.currentTime >= end) {
+      if (newLeft > fEndPx || Audio.currentTime > end) {
         Audio.pause();
         style.left = `${fEndPx}px`;
         return clearInterval(this.state.playTimer);

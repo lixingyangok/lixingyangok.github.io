@@ -7,14 +7,12 @@ import keyDownFn from "./js/key-down-fn.js";
 import MouseFn from './js/mouse-fn.js';
 import fileFn from './js/file-fn.js';
 
-
-export default class Tool extends window.mix(
+const MyClass = window.mix(
   React.Component,
-  coreFn,
-  keyDownFn,
-  MouseFn,
-  fileFn,
-) {
+  coreFn, keyDownFn, MouseFn, fileFn,
+);
+
+export default class Tool extends MyClass {
   oCanvas = React.createRef();
   oAudio = React.createRef();
   oWaveWrap = React.createRef();
@@ -22,10 +20,7 @@ export default class Tool extends window.mix(
   oSententList = React.createRef();
   constructor(props) {
     super(props);
-    const oFirstLine = this.fixTime({
-      start: 0.1, end: 5,
-      start_: '', end_: '', long: 0, text: "",
-    });
+    const oFirstLine = this.fixTime({start: 0.1, end: 5});
     this.state = {
       buffer: {}, //音频数据
       aPeaks: [], //波形数据
@@ -59,7 +54,7 @@ export default class Tool extends window.mix(
         <Spin spinning={this.state.loading} size="large"></Spin>
         <cpnt.WaveWrap ref={this.oWaveWrap}
           onScroll={() => this.onScrollFn()}
-          style={{height: `${iCanvasHeight + 15}px`}}
+          style={{height: `${iCanvasHeight + cpnt.iScrollHeight}px`}}
         >
           <canvas height={iCanvasHeight} ref={this.oCanvas} />
           <audio src={fileSrc} ref={this.oAudio}/>
@@ -67,7 +62,6 @@ export default class Tool extends window.mix(
             onContextMenu={ev => this.clickOnWave(ev)}
             onMouseDown={ev=>this.mouseDownFn(ev)}
           >
-            <i className="pointer" ref={this.oPointer}/>
             <cpnt.MarkWrap className="mark-wrap" >
               {[...Array(~~duration).keys()].map((cur, idx) => {
                 return <span className="second-mark" key={cur}
@@ -78,6 +72,7 @@ export default class Tool extends window.mix(
               })}
             </cpnt.MarkWrap>
             <cpnt.RegionWrap>
+              <i className="pointer" ref={this.oPointer}/>
               {aTimeLine.map(({ start, end }, idx) => {
                 return <span key={idx}
                   className={idx === iCurLine ? "cur region" : "region"}
