@@ -1,18 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+/*
+ * @Author: 李星阳
+ * @LastEditors: 李星阳
+ * @Description: 
+ */ 
+import React, {Suspense} from 'react';
+import { BrowserRouter, Route, Redirect, Switch } from 'react-router-dom';
+import Navigation, {aNavData} from './common/components/navigation/navigation.jsx';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>
-          Hello React
-        </h1>
-      </header>
-    </div>
-  );
+  return <BrowserRouter>
+    <Navigation/>
+    {/* ▼异步组件父级必须有 Suspense */}
+    <Suspense fallback={<div>Loading...</div>}>
+      <Switch>
+        <Redirect exact from="/" to="/index" ></Redirect>
+        {aNavData.map((cur,idx)=>{
+          return <Route key={idx}
+            path={cur.path} component={cur.component}
+          />
+        })}
+      </Switch>
+    </Suspense>
+  </BrowserRouter>
 }
 
 export default App;
+

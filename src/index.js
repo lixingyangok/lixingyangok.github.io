@@ -1,14 +1,34 @@
+/*
+ * @Author: 李星阳
+ * @LastEditors: 李星阳
+ * @Description: 
+ */ 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import {mix} from './common/common.js';
+import lf from 'localforage';
+
+// ▼样式
+import 'antd/dist/antd.css';
+
+Object.defineProperties(window, {
+  mix: {
+    writable: false,
+    value: mix,
+  },
+  lf: {
+    writable: false,
+    value: lf,
+  },
+});
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  // <React.StrictMode>
+    <App />,
+  // </React.StrictMode>,
+  document.getElementById('root'),
 );
 
 // If you want your app to work offline and load faster, you can change
